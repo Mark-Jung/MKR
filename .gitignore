@@ -3,3 +3,4 @@ logs/
 __pycache__/
 *.conf
 deploy*
+migrations/

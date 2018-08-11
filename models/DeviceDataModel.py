@@ -1,4 +1,6 @@
 from db import db
+from datetime import datetime
+
 from models.basemodel import BaseModel
 from utils.jsonable import JsonEncodedDict
 
@@ -7,12 +9,13 @@ class DeviceDataModel(db.Model, BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     device_id = db.Column(db.String(255))
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime)
     device_metadata = db.Column(JsonEncodedDict)
 
     def __init__(self, device_id, metadata):
         self.device_id = device_id
         self.device_metadata = metadata
+        self.date_created = datetime.now()
 
     def json(self):
         return {

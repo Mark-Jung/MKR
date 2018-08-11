@@ -13,6 +13,27 @@ TEST_DB = 'test.db'
 
 class DeviceTests(unittest.TestCase):
 
+    shadow_cash = {
+        "device_id": "cash",
+        "shadow_metadata": {
+            "percent": 0
+        },
+        "alert_level": 23,
+        "container": 1,
+        "alias": "monay"
+    }
+
+    shadow_money = {
+        "device_id": "money",
+        "shadow_metadata": {
+            "percent": 0
+        },
+        "alert_level": 23,
+        "container": 1,
+        "alias": "monaaaaaaay"
+    }
+
+
     ############################
     #### setup and teardown ####
     ############################
@@ -34,29 +55,43 @@ class DeviceTests(unittest.TestCase):
         pass
 
     def test_device_shadow_creation(self):
-        sample_niche = self.app.post('/device/register', data=json.dumps({"device_id": "cash"}))
+        sample_niche = self.app.post('/device/register', data=json.dumps(self.shadow_cash))
         self.assertEqual(201, sample_niche.status_code)
+        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['cash']}))
+        self.assertEqual(200, got_cash.status_code)
 
     def test_invalid_device_shadow(self):
         bad_niche_id = self.app.post('/device/register', data=json.dumps({"wow":"hi"}))
         self.assertEqual(400, bad_niche_id.status_code)
 
     def test_device_data_stamp_creation_and_get_all(self):
-        sample_niche = self.app.post('/device/register', data=json.dumps({"device_id": "cash"}))
-        self.assertEqual(201, sample_niche.status_code)
-        sample_niche = self.app.post('/device/register', data=json.dumps({"device_id": "money"}))
-        self.assertEqual(201, sample_niche.status_code)
+        sample_niche1 = self.app.post('/device/register', data=json.dumps(self.shadow_cash))
+        self.assertEqual(201, sample_niche1.status_code)
+        sample_niche2 = self.app.post('/device/register', data=json.dumps(self.shadow_money))
+        self.assertEqual(201, sample_niche2.status_code)
 
         sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "cash", "metadata":{"battery": 23, "percentage": 12 }}))
         self.assertEqual(201, sample_stamp.status_code)
+
+        # updates initially -- case n
+        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['cash']}))
+        self.assertEqual(200, got_cash.status_code)
+        cash_data = json.loads(got_cash.data.decode())
+        self.assertEqual(12, cash_data['response'][0]['shadow_metadata']['percentage'])
 
         all_stamps = self.app.get('/device')
         self.assertEqual(200, all_stamps.status_code)
         all_stamps_data = json.loads(all_stamps.data.decode())
         self.assertEqual(1, len(all_stamps_data['response']))
 
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "cash", "metadata":{"battery": 23, "percentage": 12 }}))
+        # updates -- case n + 1
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "cash", "metadata":{"battery": 23, "percentage": 23 }}))
         self.assertEqual(201, sample_stamp.status_code)
+        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['cash']}))
+        self.assertEqual(200, got_cash.status_code)
+        cash_data = json.loads(got_cash.data.decode())
+        self.assertEqual(23, cash_data['response'][0]['shadow_metadata']['percentage'])
+
         sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "money", "metadata":{"battery": 23, "percentage": 12 }}))
         self.assertEqual(201, sample_stamp.status_code)
 

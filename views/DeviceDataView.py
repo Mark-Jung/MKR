@@ -31,13 +31,26 @@ class DeviceDataView(MethodView):
     @classmethod
     def register_device(cls):
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ['device_id']
+        req_params = ['device_id', 'shadow_metadata', 'alert_level', 'container', 'alias']
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = DeviceDataController.create_shadow(data['device_id'])
+        error_message, status = DeviceDataController.create_shadow(data['device_id'], data['shadow_metadata'], data['alert_level'], data['container'], data['alias'])
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
         return json.dumps({"response": "Success"}), status
+
+    @classmethod
+    def get_niches(cls):
+        data = json.loads(request.data.decode('utf-8'))
+        req_params = ['niche_ids']
+        if not ReqParser.check_body(data, req_params):
+            return json.dumps({"error_message": "ill-formed request"}), 400
+
+        error_message, status, response = DeviceDataController.get_shadows(data['niche_ids'])
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
 

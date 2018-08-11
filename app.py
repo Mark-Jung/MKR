@@ -10,8 +10,10 @@ from flask_basicauth import BasicAuth
 from werkzeug.exceptions import HTTPException
 
 from views.DeviceDataView import DeviceDataView 
+
 from models.DeviceDataModel import DeviceDataModel
 from models.DeviceShadowModel import DeviceShadowModel
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
@@ -33,8 +35,7 @@ def hello_world():
 
 @app.route('/device/register', methods=['POST'])
 def create_niche():
-    if request.method == 'POST':
-        return DeviceDataView.register_device()
+    return DeviceDataView.register_device()
 
 @app.route('/device', methods=['GET', 'POST'])
 def collect_data():
@@ -42,6 +43,10 @@ def collect_data():
         return DeviceDataView.collect_data()
     elif request.method == 'GET':
         return DeviceDataView.get_all()
+
+@app.route('/dashboard', methods=['POST'])
+def load_dashboard():
+    return DeviceDataView.get_niches()
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
