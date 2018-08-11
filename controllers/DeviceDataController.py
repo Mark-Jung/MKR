@@ -23,6 +23,7 @@ class DeviceDataController():
         if target_device.date_updated < new_stamp.date_created:
             try:
                 target_device.shadow_metadata = new_stamp.device_metadata
+                target_device.date_updated = new_stamp.date_created
                 target_device.save_to_db()
             except:
                 cls.logger.exception("Error while saving most recent")
