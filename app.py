@@ -71,9 +71,9 @@ class DeviceDataAdminView(ModelView):
     column_default_sort = ('date_created', True)
 
 class DeviceShadowAdminView(ModelView):
-    column_list = ['device_id', 'date_created', 'shadow_metadata']
+    column_list = ['device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'shadow_metadata']
     column_searchable_list = ['device_id']
-    column_filters = ['device_id', 'date_created']
+    column_filters = ['device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias']
     column_default_sort = ('date_created', True)
 
 admin.add_view(DeviceDataAdminView(DeviceDataModel, db.session))
