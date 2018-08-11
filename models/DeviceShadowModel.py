@@ -28,7 +28,7 @@ class DeviceShadowModel(db.Model, BaseModel):
         return {
                 "device_id": self.device_id,
                 "date_created": self.date_created.strftime("%Y-%m-%d %H:%M:%S"),
-                "date_updated": self.date_created.strftime("%Y-%m-%d %H:%M:%S"),
+                "date_updated": self.date_updated.strftime("%Y-%m-%d %H:%M:%S"),
                 "shadow_metadata": self.shadow_metadata,
                 "alert_level": self.alert_level,
                 "container": self.container,
