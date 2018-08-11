@@ -1,8 +1,10 @@
 import os
+import json
 
 from db import db
 from flask import Flask, request, redirect, Response
-from flask_cors import CORS
+from flask_socketio import SocketIO, emit, rooms
+from flask_cors import cross_origin
 from flask_migrate import Migrate, MigrateCommand
 from flask_admin import Admin
 from flask_admin.contrib import sqla
@@ -11,9 +13,12 @@ from werkzeug.exceptions import HTTPException
 
 from views.DeviceDataView import DeviceDataView 
 
+from controllers.DeviceDataController import DeviceDataController
+
 from models.DeviceDataModel import DeviceDataModel
 from models.DeviceShadowModel import DeviceShadowModel
 
+from utils.parser import ReqParser
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
@@ -23,21 +28,20 @@ app.config['BASIC_AUTH_PASSWORD'] = 'selmanisgod'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
 admin = Admin(app, name="nich", template_mode='bootstrap3')
-
-if __name__ == '__main__':
-    CORS(app)
-#else:
-    # CORS(app, resources={r"/*": {"origins": "idk it yet"}})
+socketio = SocketIO(app)
 
 @app.route('/')
+@cross_origin()
 def hello_world():
     return "running!"
 
 @app.route('/device/register', methods=['POST'])
+@cross_origin()
 def create_niche():
     return DeviceDataView.register_device()
 
 @app.route('/device', methods=['GET', 'POST'])
+@cross_origin()
 def collect_data():
     if request.method == 'POST':
         return DeviceDataView.collect_data()
@@ -45,8 +49,21 @@ def collect_data():
         return DeviceDataView.get_all()
 
 @app.route('/dashboard', methods=['POST'])
+@cross_origin()
 def load_dashboard():
     return DeviceDataView.get_niches()
+
+@socketio.on('connect')
+def on_connect():
+    emit("update")
+
+@socketio.on('update')
+def on_update(niche_ids):
+    error_msg, status, response = DeviceDataController.get_shadows(niche_ids)
+    if error_msg:
+        emit("error")
+    else:
+        emit("updated", list(map(lambda x : x.json() if x else None, response)))
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
@@ -85,5 +102,5 @@ if __name__ == '__main__':
     @app.before_first_request
     def create_tables():
         db.create_all()
-    app.run()
+    socketio.run(app)
 
