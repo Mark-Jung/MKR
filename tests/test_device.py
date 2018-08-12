@@ -20,7 +20,14 @@ class DeviceTests(unittest.TestCase):
         },
         "alert_level": 23,
         "container": 1,
-        "alias": "monay"
+        "alias": "monay",
+        "auto_order_store": "",
+        "product_metadata": {
+            "product_name": "cash",
+            "product_image": "url",
+            "product_quantity": 2,
+            "product_price": 23.22
+        }
     }
 
     shadow_money = {
@@ -30,7 +37,14 @@ class DeviceTests(unittest.TestCase):
         },
         "alert_level": 23,
         "container": 1,
-        "alias": "monaaaaaaay"
+        "alias": "monaaaaaaay",
+        "auto_order_store": "",
+        "product_metadata": {
+            "product_name": "money",
+            "product_image": "url",
+            "product_quantity": 2,
+            "product_price": 23.22
+        }
     }
 
 

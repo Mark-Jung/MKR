@@ -14,8 +14,10 @@ class DeviceShadowModel(db.Model, BaseModel):
     alert_level = db.Column(db.Integer)
     container = db.Column(db.Integer)
     alias = db.Column(db.String)
+    auto_order_store = db.Column(db.String)
+    product_metadata = db.Column(JsonEncodedDict)
 
-    def __init__(self, device_id, shadow_metadata, alert_level, container, alias):
+    def __init__(self, device_id, shadow_metadata, alert_level, container, alias, auto_order_store, product_metadata):
         self.device_id = device_id
         self.date_created = datetime.now()
         self.date_updated = datetime.now()
@@ -23,6 +25,8 @@ class DeviceShadowModel(db.Model, BaseModel):
         self.alert_level = alert_level
         self.container = container
         self.alias = alias
+        self.auto_order_store = auto_order_store
+        self.product_metadata = product_metadata
 
     def json(self):
         return {
@@ -32,7 +36,9 @@ class DeviceShadowModel(db.Model, BaseModel):
                 "shadow_metadata": self.shadow_metadata,
                 "alert_level": self.alert_level,
                 "container": self.container,
-                "alias": self.alias
+                "alias": self.alias,
+                "auto_order_store": self.auto_order_store,
+                "product_metadata": self.product_metadata,
                 }
 
     @classmethod

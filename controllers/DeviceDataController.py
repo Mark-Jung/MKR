@@ -32,13 +32,13 @@ class DeviceDataController():
 
 
     @classmethod
-    def create_shadow(cls, device_id, shadow_metadata, alert_level, container, alias):
+    def create_shadow(cls, device_id, shadow_metadata, alert_level, container, alias, auto_order_store, product_metadata):
         if DeviceShadowModel.find_by_device_id(device_id):
             cls.logger.exception("Tried to create a shadow with the same niche_id")
             return "Invalid Request", 400 
         
         try:
-            new_shadow = DeviceShadowModel(device_id, shadow_metadata, alert_level, container, alias)
+            new_shadow = DeviceShadowModel(device_id, shadow_metadata, alert_level, container, alias, auto_order_store, product_metadata)
             new_shadow.save_to_db()
         except:
             cls.logger.exception("Error while creating Device Shadow")

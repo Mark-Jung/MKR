@@ -31,11 +31,11 @@ class DeviceDataView(MethodView):
     @classmethod
     def register_device(cls):
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ['device_id', 'shadow_metadata', 'alert_level', 'container', 'alias']
+        req_params = ['device_id', 'shadow_metadata', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = DeviceDataController.create_shadow(data['device_id'], data['shadow_metadata'], data['alert_level'], data['container'], data['alias'])
+        error_message, status = DeviceDataController.create_shadow(data['device_id'], data['shadow_metadata'], data['alert_level'], data['container'], data['alias'], data['auto_order_store'], data['product_metadata'])
 
         if error_message:
             return json.dumps({"error_message": error_message}), status

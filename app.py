@@ -3,7 +3,6 @@ import json
 
 from db import db
 from flask import Flask, request, redirect, Response
-from flask_socketio import SocketIO, emit, rooms
 from flask_cors import cross_origin
 from flask_migrate import Migrate, MigrateCommand
 from flask_admin import Admin
@@ -28,7 +27,6 @@ app.config['BASIC_AUTH_PASSWORD'] = 'selmanisgod'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
 admin = Admin(app, name="nich", template_mode='bootstrap3')
-socketio = SocketIO(app)
 
 @app.route('/')
 @cross_origin()
@@ -52,18 +50,6 @@ def collect_data():
 @cross_origin()
 def load_dashboard():
     return DeviceDataView.get_niches()
-
-@socketio.on('connect')
-def on_connect():
-    emit("update")
-
-@socketio.on('update')
-def on_update(niche_ids):
-    error_msg, status, response = DeviceDataController.get_shadows(niche_ids)
-    if error_msg:
-        emit("error")
-    else:
-        emit("updated", list(map(lambda x : x.json() if x else None, response)))
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
@@ -102,5 +88,5 @@ if __name__ == '__main__':
     @app.before_first_request
     def create_tables():
         db.create_all()
-    socketio.run(app)
+    app.run()
 
