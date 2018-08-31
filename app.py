@@ -11,8 +11,7 @@ from flask_basicauth import BasicAuth
 from werkzeug.exceptions import HTTPException
 
 from views.DeviceDataView import DeviceDataView 
-
-from controllers.DeviceDataController import DeviceDataController
+from views.FamilyView import FamilyView
 
 from models.DeviceDataModel import DeviceDataModel
 from models.DeviceShadowModel import DeviceShadowModel
@@ -26,7 +25,7 @@ app.config['BASIC_AUTH_USERNAME'] = 'niche'
 app.config['BASIC_AUTH_PASSWORD'] = 'selmanisgod'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
-admin = Admin(app, name="nich", template_mode='bootstrap3')
+admin = Admin(app, name="niche", template_mode='bootstrap3')
 
 @app.route('/')
 @cross_origin()
@@ -50,6 +49,10 @@ def collect_data():
 @cross_origin()
 def load_dashboard():
     return DeviceDataView.get_niches()
+
+@app.route('/family/register', methods=['POST'])
+def create_family():
+    return FamilyView.register_family()
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
