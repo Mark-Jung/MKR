@@ -56,9 +56,17 @@ class UserTests(unittest.TestCase):
 
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
+        family_data = json.loads(family.data.decode())
+        print(family_data)
 
     def test_member_creation(self):
 
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
+        print(family_data)
+
+        # self.member_info["family_id"] = 
+        member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        self.assertEqual(201, member.status_code)
+

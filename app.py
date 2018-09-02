@@ -51,8 +51,12 @@ def load_dashboard():
     return DeviceDataView.get_niches()
 
 @app.route('/family/register', methods=['POST'])
-def create_family():
+def register_family():
     return FamilyView.register_family()
+
+@app.route('/member/register', methods=['POST'])
+def register_member():
+    return MemberView.register_member()
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):

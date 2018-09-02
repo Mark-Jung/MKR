@@ -1,21 +1,21 @@
 from flask import request
 from flask.views import MethodView
-from controllers.FamilyController import FamilyController
+from controllers.MemberController import MemberController
 from utils.parser import ReqParser
 
 import json
 
-class FamilyView(MethodView):
+class MemberView(MethodView):
     
     @classmethod
-    def register_family(cls):
+    def register_member(cls):
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ['address_line1', 'address_line2', 'city', 'state', 'zip_code', 'phone', 'email', 'name']
+        req_params = ["first_name", "last_name", "email", "invite_code", "authority", "password"]
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status, family_name = FamilyController.register_family(data)
+        error_message, status, response = MemberController.register_member(data)
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
-        return json.dumps({"response": family_name}), status
+        return json.dumps({"response": response}), status

@@ -20,7 +20,10 @@ class FamilyModel(db.Model, BaseModel):
     phone = db.Column(db.String(20))
     email = db.Column(db.String(255))
 
-    def __init__(self, address_line1, address_line2, city, state, zip_code, name, phone, email):
+    admin_invite = db.Column(db.String(100))
+    member_invite = db.Column(db.String(100))
+
+    def __init__(self, address_line1, address_line2, city, state, zip_code, name, phone, email, admin_invite, member_invite):
         self.address_line1 = address_line1
         self.address_line2 = address_line2
         self.city = city
@@ -29,6 +32,8 @@ class FamilyModel(db.Model, BaseModel):
         self.name = name
         self.phone = phone
         self.email = email
+        self.admin_invite = admin_invite
+        self.member_invite = member_invite
 
     def json(self):
         return {
@@ -40,6 +45,8 @@ class FamilyModel(db.Model, BaseModel):
             "name": self.name,
             "phone": self.phone,
             "email": self.email,
+            "admin_invite": self.admin_invite,
+            "member_invite": self.member_invite,
         }
 
     @classmethod
@@ -53,3 +60,12 @@ class FamilyModel(db.Model, BaseModel):
     @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(phone=phone).first()
+
+    @classmethod
+    def find_by_invite_admin(cls, admin_invite):
+        return cls.query.filter_by(admin_invite=admin_invite)
+
+    @classmethod
+    def find_by_invite_member(cls, member_invite):
+        return cls.query.filter_by(member_invite=member_invite)
+        
