@@ -23,11 +23,10 @@ class UserTests(unittest.TestCase):
         "name": "niche",
     }
 
-    initial_member_info = {
+    member_info = {
         "email": "niche@niche.io",
         "first_name": "niche",
         "last_name": "nichel",
-        "authority": 1,
         "password": "nicho"
     }
 
@@ -53,20 +52,28 @@ class UserTests(unittest.TestCase):
         pass
 
     def test_family_creation(self):
-
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
-        print(family_data)
 
     def test_member_creation(self):
-
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
-        print(family_data)
 
-        # self.member_info["family_id"] = 
+        self.member_info["invite_code"] = family_data['response']['member']
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
         self.assertEqual(201, member.status_code)
+
+    def test_member_signin(self):
+        family = self.app.post('/family/register', data=json.dumps(self.family_info))
+        self.assertEqual(201, family.status_code)
+        family_data = json.loads(family.data.decode())
+
+        self.member_info["invite_code"] = family_data['response']['member']
+        member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        self.assertEqual(201, member.status_code)
+
+        # token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
+        # self.assertEqual(200, token.status_code)
 

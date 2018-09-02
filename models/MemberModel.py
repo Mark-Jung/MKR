@@ -15,16 +15,16 @@ class MemberModel(db.Model, BaseModel):
     email = db.Column(db.String(255))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
-    family_id = db.Column(db.Integer)
+    fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
     authority = db.Column(db.Integer)
     password = db.Column(db.String(255))
 
 
-    def __init__(self, first_name, last_name, email, family_name, authority, password):
+    def __init__(self, first_name, last_name, email, fam_id, authority, password):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.family_name = family_name
+        self.fam_id = fam_id
         self.authority = authority
         self.password = Bcrypt().generate_password_hash(password).decode()
 
@@ -33,17 +33,17 @@ class MemberModel(db.Model, BaseModel):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "email": self.email,
-            "family_name": self.family,
+            "fam_id": self.fam_id,
             "authority": self.authority,
         }
         
     @classmethod
     def find_by_email(cls, email):
-        return cls.query.filter_by(phone=phone).first()
+        return cls.query.filter_by(email=email).first()
 
     @classmethod
-    def find_by_family(cls, family_name):
-        return cls.query.filter_by(family_name=family_name).all()
+    def find_by_family(cls, fam_id):
+        return cls.query.filter_by(fam_id=fam_id).all()
 
     def validate_password(self, password):
         """

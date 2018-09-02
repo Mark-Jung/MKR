@@ -18,15 +18,15 @@ class FamilyController():
             return "Ill-formed Reqeust. Name should be unique", 400, None
 
         try: 
-            admin_invite = FamilyController.generate_invitecode(data['name'] + '_admin')
-            member_invite = FamilyController.generate_invitecode(data['name'] + '_member')
+            admin_invite = FamilyController.generate_invite(data['name'] + '_admin_')
+            member_invite = FamilyController.generate_invite(data['name'] + '_member_')
             new_fam = FamilyModel(data['address_line1'], data['address_line2'], data['city'], data['state'], data['zip_code'], data['name'], data['phone'], data['email'], admin_invite, member_invite)
             new_fam.save_to_db()
         except:
             cls.logger.exception("Error creating a family model")
             return "Internal Server Error", 500, None
 
-        return "", 201, new_fam.name
+        return "", 201, {"admin": new_fam.admin_invite, "member": new_fam.member_invite}
     
     @classmethod
     def generate_invite(cls, keyword):
@@ -41,6 +41,4 @@ class FamilyController():
                 new_invite = keyword
             
         return new_invite
-
-
     

@@ -12,6 +12,7 @@ from werkzeug.exceptions import HTTPException
 
 from views.DeviceDataView import DeviceDataView 
 from views.FamilyView import FamilyView
+from views.MemberView import MemberView
 
 from models.DeviceDataModel import DeviceDataModel
 from models.DeviceShadowModel import DeviceShadowModel

@@ -63,9 +63,9 @@ class FamilyModel(db.Model, BaseModel):
 
     @classmethod
     def find_by_invite_admin(cls, admin_invite):
-        return cls.query.filter_by(admin_invite=admin_invite)
+        return cls.query.filter_by(admin_invite=admin_invite).first()
 
     @classmethod
     def find_by_invite_member(cls, member_invite):
-        return cls.query.filter_by(member_invite=member_invite)
+        return cls.query.filter_by(member_invite=member_invite).first()
         
