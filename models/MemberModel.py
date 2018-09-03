@@ -51,14 +51,14 @@ class MemberModel(db.Model, BaseModel):
         """
         return Bcrypt().check_password_hash(self.password, password)
     
-    def generate_token(self, _id):
+    def generate_token(self):
         """ Generates the access token"""
         try:
             # set up a payload with an expiration time
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=100),
                 'iat': datetime.utcnow(),
-                'sub': _id
+                'sub': self._id
             }
             # create the byte string token using the payload and the SECRET key
             jwt_bytes = jwt.encode(

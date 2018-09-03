@@ -74,6 +74,6 @@ class UserTests(unittest.TestCase):
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
         self.assertEqual(201, member.status_code)
 
-        # token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
-        # self.assertEqual(200, token.status_code)
+        token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
+        self.assertEqual(200, token.status_code)
 

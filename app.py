@@ -59,6 +59,10 @@ def register_family():
 def register_member():
     return MemberView.register_member()
 
+@app.route('/signin', methods=['POST'])
+def signin():
+    return MemberView.signin()
+
 class ModelView(sqla.ModelView):
     def is_accessible(self):
         if not basic_auth.authenticate():

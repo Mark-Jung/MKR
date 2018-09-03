@@ -35,5 +35,14 @@ class MemberController():
 
         return "", 201
 
-
+    @classmethod
+    def signin(cls, data):
+        member = MemberModel.find_by_email(data['email'])
+        if member:
+            if member.validate_password(data['password']):
+                return "", 200, member.generate_token()
+            else:
+                return "Invalid combination", 403, None
+        else:
+            return "Ill-formed Request", 400, None
     
