@@ -4,4 +4,4 @@ __pycache__/
 *.conf
 deploy*
 migrations/
-tests/test.db
+./tests/*.db
