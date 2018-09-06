@@ -40,7 +40,12 @@ class MemberController():
         member = MemberModel.find_by_email(data['email'])
         if member:
             if member.validate_password(data['password']):
-                return "", 200, member.generate_token()
+                try:
+                    token = member.generate_token()
+                except:
+                    cls.logger.exception("Error generating token")
+                    return "", 500, None
+                return "", 200, token
             else:
                 return "Invalid combination", 403, None
         else:
