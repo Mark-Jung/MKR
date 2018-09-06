@@ -12,6 +12,9 @@ class CheckoutController():
     def checkout(cls, member_id, data):
         # make checkout object
         member = MemberModel.find_by_id(member_id)
+        if member.authority != 100:
+            return "Ill-formed Request", 403
+            
         try:
             new_checkout = CheckoutModel(member.fam_id, member.first_name, member.last_name, data['total'])
             new_checkout.save_to_db()
@@ -20,7 +23,6 @@ class CheckoutController():
             return "Internal Server Error", 500
         
         # make the list of objects
-
         for product in data['items']:
             try:
                 new_product = ProductModel(product['store'], product['price'], product['url'], product['name'], new_checkout.id)
