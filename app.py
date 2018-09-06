@@ -10,6 +10,7 @@ from flask_admin.contrib import sqla
 from flask_basicauth import BasicAuth
 from werkzeug.exceptions import HTTPException
 
+from views.CheckoutView import CheckoutView
 from views.DeviceDataView import DeviceDataView 
 from views.FamilyView import FamilyView
 from views.MemberView import MemberView
@@ -62,6 +63,10 @@ def register_member():
 @app.route('/signin', methods=['POST'])
 def signin():
     return MemberView.signin()
+
+@app.route('/checkout', methods=['POST'])
+def checkout():
+    return CheckoutView.checkout()
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):

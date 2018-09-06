@@ -1,8 +1,9 @@
-from db import db
+import os
 from datetime import datetime, timedelta
 from flask_bcrypt import Bcrypt
 import jwt
 
+from db import db
 from models.basemodel import BaseModel
 from utils.jsonable import JsonEncodedDict
 
@@ -58,19 +59,18 @@ class MemberModel(db.Model, BaseModel):
             payload = {
                 'exp': datetime.utcnow() + timedelta(days=100),
                 'iat': datetime.utcnow(),
-                'sub': self._id
+                'sub': self.id
             }
             # create the byte string token using the payload and the SECRET key
             jwt_bytes = jwt.encode(
                 payload,
-                #'wjdrngusisthecreatorofreedforfun',
-                os.environ['SECRET'],
+                os.environ.get('SECRET', 'test'),
                 algorithm='HS256'
             )
-            return jwt_bytes
+            return jwt_bytes.decode('utf-8')
         except Exception as e:
             # return an error in string format if an exception occurs
-            return str(e)
+            raise Exception(str(e))
 
     @staticmethod
     def update_token(token):
@@ -79,14 +79,14 @@ class MemberModel(db.Model, BaseModel):
         give them a 100 day extension
         """
         try:
-            payload = jwt.decode(token, os.environ['SECRET'])
+            payload = jwt.decode(token, os.environ.get('SECRET', 'test'))
             payload['exp'] = datetime.utcnow() + timedelta(days=100)
             jwt_bytes = jwt.encode(
                     payload,
-                    os.environ['SECRET'],
+                    os.environ.get('SECRET', 'test'),
                     algorithm='HS256'
                     )
-            return jwt_bytes
+            return jwt_bytes.decode('utf-8')
         except Exception as e:
             return str(e)
 
@@ -95,7 +95,7 @@ class MemberModel(db.Model, BaseModel):
         """Decodes the access token from the Authorization header."""
         try:
             # try to decode the token using our SECRET variable
-            payload = jwt.decode(token, os.environ['SECRET'])
+            payload = jwt.decode(token, os.environ.get('SECRET', 'test'))
             return "", payload['sub']
         except jwt.ExpiredSignatureError:
             # the token is expired, return an error string
