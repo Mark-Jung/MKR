@@ -5,3 +5,4 @@ __pycache__/
 deploy*
 migrations/
 ./tests/*.db
+setup.sh

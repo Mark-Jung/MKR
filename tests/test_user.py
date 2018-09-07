@@ -61,7 +61,7 @@ class UserTests(unittest.TestCase):
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
 
-        self.member_info["invite_code"] = family_data['response']['member']
+        self.member_info["invite_code"] = family_data['response']['admin']
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
         self.assertEqual(201, member.status_code)
 
@@ -70,7 +70,7 @@ class UserTests(unittest.TestCase):
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
 
-        self.member_info["invite_code"] = family_data['response']['member']
+        self.member_info["invite_code"] = family_data['response']['admin']
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
         self.assertEqual(201, member.status_code)
 

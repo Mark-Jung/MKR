@@ -35,13 +35,13 @@ class UserTests(unittest.TestCase):
         "total": 1000,
         "items": [{
             "store": "Walmart",
-            "price": 5,
-            "url": "hi",
+            "price": 500,
+            "url": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
             "name": "cat",
         }, {
             "store": "Walmart",
-            "price": 5,
-            "url": "hi",
+            "price": 500,
+            "url": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
             "name": "cat",
         }]
     }
@@ -72,7 +72,7 @@ class UserTests(unittest.TestCase):
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
 
-        self.member_info["invite_code"] = family_data['response']['member']
+        self.member_info["invite_code"] = family_data['response']['admin']
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
         self.assertEqual(201, member.status_code)
 
@@ -87,3 +87,26 @@ class UserTests(unittest.TestCase):
                 content_type= "application/json"
             ))
         self.assertEqual(200, checkout.status_code)
+
+    def test_member_checkout(self):
+        # a member shouldn't be able to checkout 
+        family = self.app.post('/family/register', data=json.dumps(self.family_info))
+        self.assertEqual(201, family.status_code)
+        family_data = json.loads(family.data.decode())
+
+        self.member_info["invite_code"] = family_data['response']['member']
+        member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        self.assertEqual(201, member.status_code)
+
+        token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
+        self.assertEqual(200, token.status_code)
+        access_token = json.loads(token.data.decode())['token']
+
+        checkout = self.app.post('/checkout', 
+        data=json.dumps(self.checkout_info), 
+        headers=dict(
+                Authorization="Bearer " + access_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(403, checkout.status_code)
+
