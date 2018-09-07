@@ -52,4 +52,37 @@ class BodyBuilder():
         """.format(name=name, fam_name=fam_name)
         return body
 
+
+    @classmethod
+    def alert_order(cls, total, member_name, family_name, items, checkout_id):
+        body = """
+        <html>
+            <body style="text-align:center; font-size: 18px; font-family: 'Times New Roman', Times, serif;">
+                <h3>{member_name} from family {family_name} has placed an order!</h3>
+                <div style="margin-top: 3px;">Checkout ID: {checkout_id} </div>
+                <div style="margin-top: 3px;">Move yo ass! </div>
+                <br>
+                <div style="margin-top: 3px;">estimated total is {total} </div>
+                <div>Thank you</div>
+                <br>
+                <hr style="width:50%;">
+                <br>
+                <div>items list:</div>
+                <br>
+        """.format(total=float(total/100), member_name=member_name, family_name=family_name, checkout_id=checkout_id)
+        for product in items:
+            body += """
+                <br>
+                <div style="margin-top: 3px;">Item Name: {name} </div>
+                <div style="margin-top: 3px;">Item Store: {store} </div>
+                <div style="margin-top: 3px;">Item Price: {price} </div>
+                <div style="margin-top: 3px;">Item Image below </div>
+                <img style="width: 200px; height: 110px;" src="{url}" alt="item picture" title="picture"/>
+                <br>
+            """.format(store=product['store'], price='%.2f' % float(product['price']/100), url=product['url'], name=product['name'])
+        body += """
+            </body>
+        </html>"""
+        return body 
+
         

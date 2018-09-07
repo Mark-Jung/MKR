@@ -9,7 +9,17 @@ from email.mime.text import MIMEText
 class Emailer():
     recipients = [os.environ.get("dev_email", "gujung2022@u.northwestern.edu")]
     @classmethod
-    def send_email(cls, msg, recipients):
+    def send_email(cls, subject, body, recipients):
+        # send to dev email if testing
+        if os.environ.get("SECRET", "dev") == 'dev':
+            recipients = [os.environ["dev_email"]]
+
+        # make message
+        msg = MIMEMultipart('alternative')
+        msg.add_header('Content-Type', 'text/html; charset=utf-8')
+        msg['Subject'] = subject
+        msg.attach(body)
+
         # Send the message via gmail's SMTP server.
         s = smtplib.SMTP('smtp.gmail.com', 587)
         s.starttls()
@@ -27,27 +37,23 @@ class Emailer():
 
     @classmethod
     async def signup(cls, email, name, admin_invite, member_invite, fam_name):
-        if os.environ.get("SECRET", "dev") == 'dev':
-            customer = [os.environ['dev_email']]
-        else:
-            customer = [str(email)]
-
-        msg = MIMEMultipart('alternative')
-        msg.add_header('Content-Type', 'text/html; charset=utf-8')
-        msg['Subject'] = 'Welcome to Niche!'
         if admin_invite == "":
             body = BodyBuilder.signup_joinfam(name, fam_name)
         else:
             body = BodyBuilder.signup_createfam(name, admin_invite, member_invite, fam_name)
         HTML_BODY = MIMEText(body, 'html')
-        msg.attach(HTML_BODY)
 
-        cls.send_email(msg, customer)
+        cls.send_email("Welcome to Niche!", HTML_BODY, [email]) 
  
     @classmethod
     async def invite(cls):
         pass
                
     @classmethod 
-    async def checkout(cls):
-        pass
+    async def checkout(cls, total, member_name, family_name, items, checkout_id):
+        recipients = ["iec@u.northwestern.edu", "umur@u.northwestern.edu"]
+        body = BodyBuilder.alert_order(total, member_name, family_name, items, checkout_id)
+        HTML_BODY = MIMEText(body, 'html')
+
+        cls.send_email("GO FULFILL THE NICHE ORDER!!!!!!!", HTML_BODY, recipients)
+        

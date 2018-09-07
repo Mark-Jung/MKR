@@ -35,13 +35,13 @@ class UserTests(unittest.TestCase):
         "total": 1000,
         "items": [{
             "store": "Walmart",
-            "price": 5,
-            "url": "hi",
+            "price": 500,
+            "url": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
             "name": "cat",
         }, {
             "store": "Walmart",
-            "price": 5,
-            "url": "hi",
+            "price": 500,
+            "url": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
             "name": "cat",
         }]
     }
