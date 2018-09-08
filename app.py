@@ -39,14 +39,11 @@ def hello_world():
 def create_niche():
     return DeviceDataView.register_device()
 
-@app.route('/device', methods=['GET', 'POST'])
+@app.route('/device', methods=['POST'])
 @cross_origin()
 def collect_data():
-    if request.method == 'POST':
-        return DeviceDataView.collect_data()
-    elif request.method == 'GET':
-        return DeviceDataView.get_all()
-
+    return DeviceDataView.collect_data()
+    
 @app.route('/dashboard', methods=['POST'])
 @cross_origin()
 def load_dashboard():
@@ -92,7 +89,7 @@ class DeviceDataAdminView(ModelView):
 
 class DeviceShadowAdminView(ModelView):
     column_list = ['device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'shadow_metadata', 'auto_order_store', 'product_metadata']
-    column_searchable_list = ['device_id']
+    column_searchable_list = ['device_id', 'alert_level']
     column_filters = ['device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'auto_order_store']
     column_default_sort = ('date_created', True)
 
