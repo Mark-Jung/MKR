@@ -15,7 +15,7 @@ class MemberController():
         # check if family with the same name exist
         member_already = MemberModel.find_by_email(data['email'])
         if member_already:
-            return "Ill-formed Reqeust", 400, None
+            return "Ill-formed Reqeust", 400
         
         family = FamilyModel.find_by_invite_admin(data['invite_code'])
         if family:
@@ -30,14 +30,14 @@ class MemberController():
                 authority = 50
             else:
                 cls.logger.exception("Invalid invite_code")
-                return "Ill-formed Request", 400, None
+                return "Ill-formed Request", 400
 
         try: 
             new_member = MemberModel(data['first_name'], data['last_name'], data['email'], fam_id, authority, data['password'])
             new_member.save_to_db()
         except:
             cls.logger.exception("Error creating a member.")
-            return "Internal Server Error", 500, None
+            return "Internal Server Error", 500
 
         if asyncio.get_event_loop().is_closed():
             asyncio.set_event_loop(asyncio.new_event_loop())
@@ -57,7 +57,7 @@ class MemberController():
             ]
         else:
             cls.logger.exception("Value of authority is not as expected.")
-            return "Internal Server Error", 500, None
+            return "Internal Server Error", 500
         loop.run_until_complete(asyncio.wait(tasks))
         loop.close()
 

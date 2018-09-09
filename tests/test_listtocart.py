@@ -11,7 +11,7 @@ from helper import Helper
 
 TEST_DB = 'test.db'
 
-class CheckoutTests(unittest.TestCase):
+class ListToCartTests(unittest.TestCase):
     
     family_info = {
         "address_line1": "he",
@@ -24,26 +24,32 @@ class CheckoutTests(unittest.TestCase):
         "name": "niche",
     }
 
-    member_info = {
-        "email": "niche@niche.io",
-        "first_name": "niche",
-        "last_name": "nichel",
-        "password": "nicho"
+    admin_info = {
+        "email": "admin@niche.io",
+        "first_name": "admin",
+        "last_name": "admin",
+        "password": "adminoh"
     }
 
-    checkout_info = {
-        "total": 1000,
-        "items": [{
-            "store": "Walmart",
-            "price": 500,
-            "url": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-            "name": "cat",
-        }, {
-            "store": "Walmart",
-            "price": 500,
-            "url": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-            "name": "cat",
-        }]
+    member_info = {
+        "email": "member@niche.io",
+        "first_name": "member",
+        "last_name": "member",
+        "password": "memberoo"
+    }
+
+    list_info = {
+        "alias": "cat",
+        "in_store" : "Walmart"
+    }
+
+    cart_info = {
+        "in_store": "Walmart",
+        "item_name": "cat",
+        "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
+        "item_price": "1200",
+        "item_quantity": 24,
+        "list_to_cart_id": 1,
     }
 
 
@@ -67,28 +73,43 @@ class CheckoutTests(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def test_checkout(self):
+    def test_list_register(self):
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
 
-        self.member_info["invite_code"] = family_data['response']['admin']
+        self.admin_info["invite_code"] = family_data['response']['admin']
+        self.member_info["invite_code"] = family_data['response']['member']
+        admin = self.app.post('/member/register', data=json.dumps(self.admin_info))
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        self.assertEqual(201, admin.status_code)
         self.assertEqual(201, member.status_code)
 
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
         self.assertEqual(200, token.status_code)
-        access_token = json.loads(token.data.decode())['token']
+        member_token = json.loads(token.data.decode())['token']
 
-        checkout = self.app.post('/checkout', 
-        data=json.dumps(self.checkout_info), 
+        token = self.app.post('/signin', data=json.dumps({"email":self.admin_info["email"], "password":self.admin_info["password"]}))
+        self.assertEqual(200, token.status_code)
+        admin_token = json.loads(token.data.decode())['token']
+
+        admin_add_to_list = self.app.post('/listtocart/list', 
+        data=json.dumps(self.list_info), 
         headers=dict(
-                Authorization="Bearer " + access_token,
+                Authorization="Bearer " + admin_token,
                 content_type= "application/json"
             ))
-        self.assertEqual(200, checkout.status_code)
+        self.assertEqual(201, admin_add_to_list.status_code)
 
-    def test_member_checkout(self):
+        member_add_to_list = self.app.post('/listtocart/list', 
+        data=json.dumps(self.list_info), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(201, member_add_to_list.status_code)
+
+    def test_cart_register(self):
         # a member shouldn't be able to checkout 
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
@@ -101,12 +122,4 @@ class CheckoutTests(unittest.TestCase):
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
         self.assertEqual(200, token.status_code)
         access_token = json.loads(token.data.decode())['token']
-
-        checkout = self.app.post('/checkout', 
-        data=json.dumps(self.checkout_info), 
-        headers=dict(
-                Authorization="Bearer " + access_token,
-                content_type= "application/json"
-            ))
-        self.assertEqual(403, checkout.status_code)
 

@@ -16,10 +16,10 @@ class MemberModel(db.Model, BaseModel):
     email = db.Column(db.String(255))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
-    fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
     authority = db.Column(db.Integer)
     password = db.Column(db.String(255))
 
+    fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
 
     def __init__(self, first_name, last_name, email, fam_id, authority, password):
         self.first_name = first_name

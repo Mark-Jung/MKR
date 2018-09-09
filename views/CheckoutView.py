@@ -11,7 +11,7 @@ class CheckoutView(MethodView):
     
     @classmethod
     def checkout(cls):
-        member_id = Auth.whoisit(request.headers)
+        member_id, fam_id = Auth.whoisit(request.headers)
         if member_id < 0:
             return json.dumps({"error_message": "ill-formed request"}), 400
         elif member_id == 0:

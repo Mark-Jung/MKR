@@ -13,6 +13,7 @@ from werkzeug.exceptions import HTTPException
 from views.CheckoutView import CheckoutView
 from views.DeviceDataView import DeviceDataView 
 from views.FamilyView import FamilyView
+from views.ListToCartView import ListToCartView
 from views.MemberView import MemberView
 
 from models.DeviceDataModel import DeviceDataModel
@@ -34,12 +35,16 @@ admin = Admin(app, name="niche", template_mode='bootstrap3')
 def hello_world():
     return "running!"
 
+@app.route('/checkout', methods=['POST'])
+def checkout():
+    return CheckoutView.checkout()
+
 @app.route('/device/register', methods=['POST'])
 @cross_origin()
 def create_niche():
     return DeviceDataView.register_device()
 
-@app.route('/device', methods=['GET', 'POST'])
+@app.route('/device', methods=['POST', 'GET'])
 @cross_origin()
 def collect_data():
     if request.method == 'POST':
@@ -56,6 +61,14 @@ def load_dashboard():
 def register_family():
     return FamilyView.register_family()
 
+@app.route('/listtocart/list', methods=['POST'])
+def register_list():
+    return ListToCartView.register_list()
+
+@app.route('/listtocart/cart', methods=['POST'])
+def register_cart():
+    return ListToCartView.register_cart()
+
 @app.route('/member/register', methods=['POST'])
 def register_member():
     return MemberView.register_member()
@@ -64,9 +77,6 @@ def register_member():
 def signin():
     return MemberView.signin()
 
-@app.route('/checkout', methods=['POST'])
-def checkout():
-    return CheckoutView.checkout()
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
