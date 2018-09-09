@@ -20,12 +20,16 @@ class ListToCartController():
         return "", 201
 
     @classmethod
-    def register_cart(cls, data):
+    def register_cart(cls, fam_id, data):
         # find listtocart object and update the fields
-        "item_name", "item_image", "item_price", "item_quantity", "list_to_cart_id"
         list_to_cart = ListToCartModel.find_by_id(data["list_to_cart_id"])
         if not list_to_cart:
             return "Ill-formed Request", 400
+
+        # Not your family
+        if list_to_cart.fam_id != fam_id:
+            cls.logger("WARNING WARNING WARNING BREACH ATTEMPA. At this point it should be pretty obvious that this is someone meddling with our endpoint.")
+            return "Ill-formed Requst", 400
 
         try:
             list_to_cart.in_cart = True

@@ -41,7 +41,7 @@ class ListToCartView(MethodView):
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = ListToCartController.register_cart(data)
+        error_message, status = ListToCartController.register_cart(fam_id, data)
 
         if error_message:
             return json.dumps({"error_message": error_message}), status

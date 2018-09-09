@@ -43,7 +43,16 @@ class ListToCartTests(unittest.TestCase):
         "in_store" : "Walmart"
     }
 
-    cart_info = {
+    cart_info_1 = {
+        "in_store": "Walmart",
+        "item_name": "cat",
+        "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
+        "item_price": "1200",
+        "item_quantity": 24,
+        "list_to_cart_id": 1,
+    }
+
+    cart_info_2 = {
         "in_store": "Walmart",
         "item_name": "cat",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
@@ -74,6 +83,44 @@ class ListToCartTests(unittest.TestCase):
         pass
     
     def test_list_register(self):
+        # both admin and member should be able to add item to the list.
+        family = self.app.post('/family/register', data=json.dumps(self.family_info))
+        self.assertEqual(201, family.status_code)
+        family_data = json.loads(family.data.decode())
+
+        self.admin_info["invite_code"] = family_data['response']['admin']
+        self.member_info["invite_code"] = family_data['response']['member']
+        admin = self.app.post('/member/register', data=json.dumps(self.admin_info))
+        member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        self.assertEqual(201, admin.status_code)
+        self.assertEqual(201, member.status_code)
+
+        token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
+        self.assertEqual(200, token.status_code)
+        member_token = json.loads(token.data.decode())['token']
+
+        token = self.app.post('/signin', data=json.dumps({"email":self.admin_info["email"], "password":self.admin_info["password"]}))
+        self.assertEqual(200, token.status_code)
+        admin_token = json.loads(token.data.decode())['token']
+        ### setup till here
+
+        admin_add_to_list = self.app.post('/listtocart/list', 
+        data=json.dumps(self.list_info), 
+        headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(201, admin_add_to_list.status_code)
+
+        member_add_to_list = self.app.post('/listtocart/list', 
+        data=json.dumps(self.list_info), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(201, member_add_to_list.status_code)
+
+    def test_cart_register(self):
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
@@ -109,17 +156,19 @@ class ListToCartTests(unittest.TestCase):
             ))
         self.assertEqual(201, member_add_to_list.status_code)
 
-    def test_cart_register(self):
-        # a member shouldn't be able to checkout 
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
-        self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
+        ### setup till here. Created 1 member, 1 admin, 2 list items.
+        member_add_to_cart = self.app.post('/listtocart/cart',
+        data=json.dumps(self.cart_info_1),
+        headers=dict(
+            Authorization="Bearer " + member_token,
+            content_type="application/json"
+        ))
+        self.assertEqual(200, member_add_to_cart.status_code)
 
-        self.member_info["invite_code"] = family_data['response']['member']
-        member = self.app.post('/member/register', data=json.dumps(self.member_info))
-        self.assertEqual(201, member.status_code)
-
-        token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
-        self.assertEqual(200, token.status_code)
-        access_token = json.loads(token.data.decode())['token']
-
+        admin_add_to_cart = self.app.post('/listtocart/cart',
+        data=json.dumps(self.cart_info_2),
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type="application/json"
+        ))
+        self.assertEqual(200, admin_add_to_cart.status_code)
