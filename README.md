@@ -5,7 +5,7 @@ It is built in Flask in TDD fashion, following the MVC architecture pattern.
 
 ### Installation
 
-Dillinger requires python 3.6 to run.
+MKR requires python 3.6 to run.
 
 After cloning this repository, install the dependencies and start the server.
 
