@@ -24,20 +24,40 @@ class ListToCartModel(db.Model, BaseModel):
 
     def __init__(self, alias, in_store, fam_id, adder_name):
         self.alias = alias
+        self.in_cart = False
         self.in_store = in_store
-        self.fam_id = fam_id
         self.adder = adder_name
 
-        self.in_cart = False
+        self.item_name = ""
+        self.item_image = ""
+        self.item_price = 0
+        self.item_rating = ""
+        self.item_quantity = 0
+
+        self.fam_id = fam_id
+    
+    def json(self):
+        return {
+            "id": self.id,
+            "alias": self.alias,
+            "in_cart": self.in_cart,
+            "adder": self.adder,
+            "item_name": self.item_name,
+            "item_image": self.item_image,
+            "item_price": self.item_price,
+            "item_rating": self.item_rating,
+            "item_quantity": self.item_quantity,
+            "fam_id": self.fam_id,
+        }
 
     @classmethod
     def filter_by_fam_id(cls, fam_id):
-        cls.query.filter_by(fam_id=fam_id).all()
+        return cls.query.filter_by(fam_id=fam_id).all()
     
     @classmethod
     def get_fam_list(cls, fam_id):
-        cls.query.filter(fam_id==fam_id, in_cart==False).all()
+        return cls.query.filter(cls.fam_id==fam_id, cls.in_cart==False).all()
 
     @classmethod
     def get_fam_cart(cls, fam_id):
-        cls.query.filter(fam_id==fam_id, in_cart==True).all()
+        return cls.query.filter(cls.fam_id==fam_id, cls.in_cart==True).all()

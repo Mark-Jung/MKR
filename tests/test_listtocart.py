@@ -43,7 +43,30 @@ class ListToCartTests(unittest.TestCase):
         "in_store" : "Walmart"
     }
 
+    list_info_1 = {
+        "alias": "cats1",
+        "in_store": "Manual"
+    }
+
+    list_info_2 = {
+        "alias": "cats2",
+        "in_store": "Walmart"
+    }
+
+    invalid_cart_info = {
+        "alias": "cat_alias",
+        "in_cart": True,
+        "in_store": "Walmart",
+        "item_name": "cat",
+        "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
+        "item_price": "1200",
+        "item_quantity": 24,
+        "list_to_cart_id": 3,
+    }
+
     cart_info_1 = {
+        "alias": "cat_alias",
+        "in_cart": True,
         "in_store": "Walmart",
         "item_name": "cat",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
@@ -53,12 +76,36 @@ class ListToCartTests(unittest.TestCase):
     }
 
     cart_info_2 = {
+        "alias": "cat_alias2",
+        "in_cart": True,
         "in_store": "Walmart",
-        "item_name": "cat",
+        "item_name": "cat2",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
         "item_price": "1200",
         "item_quantity": 24,
-        "list_to_cart_id": 1,
+        "list_to_cart_id": 2,
+    }
+
+    list_info_2_edit = {
+        "alias": "edit cat",
+        "in_cart": False,
+        "in_store": "Walmart",
+        "item_name": "cat2",
+        "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
+        "item_price": "1200",
+        "item_quantity": 24,
+        "list_to_cart_id": 2,
+    }
+
+    cart_info_2_edit = {
+        "alias": "edit cat",
+        "in_cart": True,
+        "in_store": "Walmart",
+        "item_name": "cat2",
+        "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
+        "item_price": "1200",
+        "item_quantity": 24,
+        "list_to_cart_id": 2,
     }
 
 
@@ -82,7 +129,7 @@ class ListToCartTests(unittest.TestCase):
     def tearDown(self):
         pass
     
-    def test_list_register(self):
+    def test_list_CRUD(self):
         # both admin and member should be able to add item to the list.
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
@@ -103,7 +150,7 @@ class ListToCartTests(unittest.TestCase):
         self.assertEqual(200, token.status_code)
         admin_token = json.loads(token.data.decode())['token']
         ### setup till here
-
+        # adding to list as admin and member Create check
         admin_add_to_list = self.app.post('/listtocart/list', 
         data=json.dumps(self.list_info), 
         headers=dict(
@@ -111,7 +158,6 @@ class ListToCartTests(unittest.TestCase):
                 content_type= "application/json"
             ))
         self.assertEqual(201, admin_add_to_list.status_code)
-
         member_add_to_list = self.app.post('/listtocart/list', 
         data=json.dumps(self.list_info), 
         headers=dict(
@@ -119,8 +165,108 @@ class ListToCartTests(unittest.TestCase):
                 content_type= "application/json"
             ))
         self.assertEqual(201, member_add_to_list.status_code)
+        # getting from list as admin and member Get check
+        list_by_admin = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_admin.status_code)
+        list_get_data_admin = json.loads(list_by_admin.data.decode())
 
-    def test_cart_register(self):
+        list_by_member = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + member_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_member.status_code)
+        list_get_data_member = json.loads(list_by_member.data.decode())
+
+        self.assertEqual(Helper.ordered(list_get_data_admin), Helper.ordered(list_get_data_member))
+        self.assertEqual(2, len(list_get_data_admin['response']))
+
+        # delete an item from list 
+        # delete invalid list to cart obj
+        delete_from_list = self.app.delete('/listtocart', 
+        data=json.dumps({"list_to_cart_id": 3}), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(400, delete_from_list.status_code)
+        list_by_admin = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_admin.status_code)
+        list_get_data_admin = json.loads(list_by_admin.data.decode())
+        self.assertEqual(2, len(list_get_data_admin['response']))
+        # valid delete
+        delete_from_list = self.app.delete('/listtocart', 
+        data=json.dumps({"list_to_cart_id": 1}), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(200, delete_from_list.status_code)
+        list_by_admin = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_admin.status_code)
+        list_get_data_admin = json.loads(list_by_admin.data.decode())
+        self.assertEqual(1, len(list_get_data_admin['response']))
+        self.assertEqual(2, list_get_data_admin['response'][0]['id'])
+
+        # edit an item from list 
+        # edit invalid list to cart obj 
+        invalid_edit_from_list = self.app.put('/listtocart', 
+        data=json.dumps(self.cart_info_1), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(400, invalid_edit_from_list.status_code)
+        # valid edit
+        edit_from_list = self.app.put('/listtocart', 
+        data=json.dumps(self.list_info_2_edit), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(200, edit_from_list.status_code)
+        list_by_admin = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_admin.status_code)
+        list_get_data_admin = json.loads(list_by_admin.data.decode())
+        self.assertEqual(1, len(list_get_data_admin['response']))
+        self.assertEqual("edit cat", list_get_data_admin['response'][0]['alias'])
+
+        # valid edit 2
+        edit_from_list = self.app.put('/listtocart', 
+        data=json.dumps(self.cart_info_2_edit), 
+        headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(200, edit_from_list.status_code)
+        list_by_admin = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_admin.status_code)
+        list_get_data_admin = json.loads(list_by_admin.data.decode())
+        self.assertEqual(0, len(list_get_data_admin['response']))
+
+
+
+    def test_cart_CRUD(self):
         family = self.app.post('/family/register', data=json.dumps(self.family_info))
         self.assertEqual(201, family.status_code)
         family_data = json.loads(family.data.decode())
@@ -157,18 +303,65 @@ class ListToCartTests(unittest.TestCase):
         self.assertEqual(201, member_add_to_list.status_code)
 
         ### setup till here. Created 1 member, 1 admin, 2 list items.
-        member_add_to_cart = self.app.post('/listtocart/cart',
-        data=json.dumps(self.cart_info_1),
+        # switch 2 items to cart
+        member_add_to_cart = self.app.post('/listtocart',
+        data=json.dumps({"list_to_cart_id": 1}),
         headers=dict(
             Authorization="Bearer " + member_token,
             content_type="application/json"
         ))
         self.assertEqual(200, member_add_to_cart.status_code)
 
-        admin_add_to_cart = self.app.post('/listtocart/cart',
-        data=json.dumps(self.cart_info_2),
+        admin_add_to_cart = self.app.post('/listtocart',
+        data=json.dumps({"list_to_cart_id": 2}),
         headers=dict(
             Authorization="Bearer " + admin_token,
             content_type="application/json"
         ))
         self.assertEqual(200, admin_add_to_cart.status_code)
+
+        # getting empty list as admin and member
+        list_by_member = self.app.get('/listtocart/list',
+        headers=dict(
+            Authorization="Bearer " + member_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, list_by_member.status_code)
+        list_get_data_member = json.loads(list_by_member.data.decode())
+        self.assertEqual(0, len(list_get_data_member['response']))
+
+        # getting cart length of 2 as admin and member
+        cart_by_member = self.app.get('/listtocart/cart',
+        headers=dict(
+            Authorization="Bearer " + member_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, cart_by_member.status_code)
+        cart_get_data_member = json.loads(cart_by_member.data.decode())
+        cart_by_admin = self.app.get('/listtocart/cart',
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, cart_by_admin.status_code)
+        cart_get_data_admin = json.loads(cart_by_admin.data.decode())
+
+        self.assertEqual(Helper.ordered(cart_get_data_admin), Helper.ordered(cart_get_data_member))
+        self.assertEqual(2, len(cart_get_data_admin['response']))
+
+        # back to list
+        admin_add_to_cart = self.app.post('/listtocart',
+        data=json.dumps({"list_to_cart_id": 2}),
+        headers=dict(
+            Authorization="Bearer " + admin_token,
+            content_type="application/json"
+        ))
+        self.assertEqual(200, admin_add_to_cart.status_code)
+        cart_by_member = self.app.get('/listtocart/cart',
+        headers=dict(
+            Authorization="Bearer " + member_token,
+            content_type= "application/json"
+        ))
+        self.assertEqual(200, cart_by_member.status_code)
+        cart_get_data_member = json.loads(cart_by_member.data.decode())
+        self.assertEqual(1, len(cart_get_data_member))

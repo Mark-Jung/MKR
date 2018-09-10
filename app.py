@@ -61,13 +61,26 @@ def load_dashboard():
 def register_family():
     return FamilyView.register_family()
 
-@app.route('/listtocart/list', methods=['POST'])
-def register_list():
-    return ListToCartView.register_list()
+@app.route('/listtocart', methods=['DELETE', 'POST', 'PUT'])
+def list_to_cart():
+    if request.method == 'DELETE':
+        return ListToCartView.delete_list_to_cart()
+    elif request.method == 'POST':
+        return ListToCartView.switch_list_to_cart()
+    elif request.method == 'PUT':
+        return ListToCartView.edit_list_to_cart()
 
-@app.route('/listtocart/cart', methods=['POST'])
-def register_cart():
-    return ListToCartView.register_cart()
+@app.route('/listtocart/list', methods=['GET', 'POST'])
+def list_to_cart_list():
+    if request.method == 'GET':
+        return ListToCartView.get_list()
+    elif request.method == 'POST':
+        return ListToCartView.register_list_to_cart()
+
+@app.route('/listtocart/cart', methods=['GET'])
+def list_to_cart_cart():
+    if request.method == 'GET':
+        return ListToCartView.get_cart()
 
 @app.route('/member/register', methods=['POST'])
 def register_member():
