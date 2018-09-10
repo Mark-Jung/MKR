@@ -8,7 +8,7 @@ class DeviceDataModel(db.Model, BaseModel):
     __tablename__ = "devicedata"
 
     id = db.Column(db.Integer, primary_key=True)
-    device_id = db.Column(db.String(255), db.ForeignKey('deviceshadow.id'))
+    device_id = db.Column(db.String(255), db.ForeignKey('deviceshadow.device_id'))
     date_created = db.Column(db.DateTime)
     device_metadata = db.Column(JsonEncodedDict)
 

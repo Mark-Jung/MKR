@@ -1,6 +1,7 @@
 # MKR
 
-MKR is the testing server powering Niche, an iot service for tracking your inventories. It is built in Flask in TDD fashion, following the MVC architecture pattern.
+MKR is the testing server powering Niche, an iot service for tracking your inventories.
+It is built in Flask in TDD fashion, following the MVC architecture pattern.
 
 ### Installation
 
@@ -31,9 +32,12 @@ $ nose2
 ```
 
 #### Getting Started
+
 There's documentation in the `views` and `models` folders which will be helpful. If you don't know what views, controllers, or models are, it is strongly suggested that you learn about MVC patterns prior to contribution. Here's an article to get you started.
 
+
 https://developer.chrome.com/apps/app_frameworks
+
 
 Try starting by grabbing issues with `easy` tags. If you are stuck, feel free to contact one of the contributors for help.
 

@@ -11,7 +11,7 @@ from helper import Helper
 
 TEST_DB = 'test.db'
 
-class UserTests(unittest.TestCase):
+class CheckoutTests(unittest.TestCase):
     
     family_info = {
         "address_line1": "he",

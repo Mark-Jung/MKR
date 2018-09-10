@@ -26,9 +26,9 @@ class Emailer():
         # os environment var for password
         if os.environ.get("SECRET", "wow") == "wow":
             print("sent mail successfully!")
-            s.login(os.environ['email'], os.environ['password'])
-            for each in recipients:
-                s.sendmail("nichesapphire@gmail.com", each, msg.as_string())
+            # s.login(os.environ['email'], os.environ['password'])
+            # for each in recipients:
+            #     s.sendmail("nichesapphire@gmail.com", each, msg.as_string())
         else:
             s.login(os.environ['email'], os.environ['password'])
             for each in recipients:

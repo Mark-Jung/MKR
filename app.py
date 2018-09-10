@@ -13,6 +13,7 @@ from werkzeug.exceptions import HTTPException
 from views.CheckoutView import CheckoutView
 from views.DeviceDataView import DeviceDataView 
 from views.FamilyView import FamilyView
+from views.ListToCartView import ListToCartView
 from views.MemberView import MemberView
 
 from models.DeviceDataModel import DeviceDataModel
@@ -34,15 +35,22 @@ admin = Admin(app, name="niche", template_mode='bootstrap3')
 def hello_world():
     return "running!"
 
+@app.route('/checkout', methods=['POST'])
+def checkout():
+    return CheckoutView.checkout()
+
 @app.route('/device/register', methods=['POST'])
 @cross_origin()
 def create_niche():
     return DeviceDataView.register_device()
 
-@app.route('/device', methods=['POST'])
+@app.route('/device', methods=['GET', 'POST'])
 @cross_origin()
 def collect_data():
-    return DeviceDataView.collect_data()
+    if request.method == 'GET':
+        return DeviceDataView.get_all()
+    elif request.method == 'POST':
+        return DeviceDataView.collect_data()
     
 @app.route('/dashboard', methods=['POST'])
 @cross_origin()
@@ -53,6 +61,27 @@ def load_dashboard():
 def register_family():
     return FamilyView.register_family()
 
+@app.route('/listtocart', methods=['DELETE', 'POST', 'PUT'])
+def list_to_cart():
+    if request.method == 'DELETE':
+        return ListToCartView.delete_list_to_cart()
+    elif request.method == 'POST':
+        return ListToCartView.switch_list_to_cart()
+    elif request.method == 'PUT':
+        return ListToCartView.edit_list_to_cart()
+
+@app.route('/listtocart/list', methods=['GET', 'POST'])
+def list_to_cart_list():
+    if request.method == 'GET':
+        return ListToCartView.get_list()
+    elif request.method == 'POST':
+        return ListToCartView.register_list_to_cart()
+
+@app.route('/listtocart/cart', methods=['GET'])
+def list_to_cart_cart():
+    if request.method == 'GET':
+        return ListToCartView.get_cart()
+
 @app.route('/member/register', methods=['POST'])
 def register_member():
     return MemberView.register_member()
@@ -61,9 +90,6 @@ def register_member():
 def signin():
     return MemberView.signin()
 
-@app.route('/checkout', methods=['POST'])
-def checkout():
-    return CheckoutView.checkout()
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
