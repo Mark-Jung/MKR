@@ -1,12 +1,33 @@
+import json
 from flask import request
 from flask.views import MethodView
+
 from controllers.DeviceDataController import DeviceDataController
 from utils.parser import ReqParser
+from utils.auth import Auth
 
-import json
 
 class DeviceDataView(MethodView):
+    @classmethod
+    def claim_niche(cls):
+        member_id, fam_id = Auth.whoisit(request.headers)
+        if member_id < 0:
+            return json.dumps({"error_message": "ill-formed request"}), 400
+        elif member_id == 0:
+            return json.dumps({"error_message": "Not Authorized"}), 403
 
+        data = json.loads(request.data.decode('utf-8'))
+        req_params = ['device_id', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']
+        if not ReqParser.check_body(data, req_params):
+            return json.dumps({"error_message": "ill-formed request"}), 400
+
+        error_message, status = DeviceDataController.claim_niche(fam_id, data)
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": "Success"}), status
+
+ 
     @classmethod
     def collect_data(cls):
         data = json.loads(request.data.decode('utf-8'))
@@ -15,6 +36,25 @@ class DeviceDataView(MethodView):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
         error_message, status = DeviceDataController.collect_data(data['device_id'], data['metadata'])
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": "Success"}), status
+
+    @classmethod
+    def edit_niche(cls):
+        member_id, fam_id = Auth.whoisit(request.headers)
+        if member_id < 0:
+            return json.dumps({"error_message": "ill-formed request"}), 400
+        elif member_id == 0:
+            return json.dumps({"error_message": "Not Authorized"}), 403
+
+        data = json.loads(request.data.decode('utf-8'))
+        req_params = ['device_id', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']
+        if not ReqParser.check_body(data, req_params):
+            return json.dumps({"error_message": "ill-formed request"}), 400
+
+        error_message, status = DeviceDataController.edit_niche(fam_id, data)
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
@@ -30,12 +70,14 @@ class DeviceDataView(MethodView):
 
     @classmethod
     def register_device(cls):
+        # Requires factory reset auth, super user authority
+
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ['device_id', 'shadow_metadata', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']
+        req_params = ['device_id']
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = DeviceDataController.create_shadow(data['device_id'], data['shadow_metadata'], data['alert_level'], data['container'], data['alias'], data['auto_order_store'], data['product_metadata'])
+        error_message, status = DeviceDataController.create_shadow(data['device_id'])
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
@@ -53,4 +95,3 @@ class DeviceDataView(MethodView):
         if error_message:
             return json.dumps({"error_message": error_message}), status
         return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
-

@@ -51,7 +51,7 @@ def collect_data():
         return DeviceDataView.get_all()
     elif request.method == 'POST':
         return DeviceDataView.collect_data()
-    
+
 @app.route('/dashboard', methods=['POST'])
 @cross_origin()
 def load_dashboard():
@@ -85,6 +85,14 @@ def list_to_cart_cart():
 @app.route('/member/register', methods=['POST'])
 def register_member():
     return MemberView.register_member()
+
+@app.route('/niche', methods=['POST', 'PUT'])
+def user_niche_actions():
+    if request.method == 'POST':
+        return DeviceDataView.claim_niche()
+    elif request.method == 'PUT':
+        return DeviceDataView.edit_niche()
+
 
 @app.route('/signin', methods=['POST'])
 def signin():

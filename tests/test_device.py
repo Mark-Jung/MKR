@@ -13,8 +13,15 @@ TEST_DB = 'test.db'
 
 class DeviceTests(unittest.TestCase):
 
-    shadow_cash = {
-        "device_id": "cash",
+    shadow_factory_init = {
+        "device_id": "trial1"
+    }
+    shadow_factory_init1 = {
+        "device_id": "23121"
+    }
+
+    shadow_claim = {
+        "device_id": "trial1",
         "shadow_metadata": {
             "percent": 0
         },
@@ -29,9 +36,8 @@ class DeviceTests(unittest.TestCase):
             "product_price": 23.22
         }
     }
-
-    shadow_money = {
-        "device_id": "money",
+    shadow_claim1 = {
+        "device_id": "23121",
         "shadow_metadata": {
             "percent": 0
         },
@@ -45,6 +51,58 @@ class DeviceTests(unittest.TestCase):
             "product_quantity": 2,
             "product_price": 23.22
         }
+    }
+
+    shadow_edit = {
+        "device_id": "trial1",
+        "shadow_metadata": {
+            "percent": 0
+        },
+        "alert_level": 50,
+        "container": 1,
+        "alias": "edited shadow",
+        "auto_order_store": "",
+        "product_metadata": {
+            "product_name": "cash",
+            "product_image": "url",
+            "product_quantity": 2,
+            "product_price": 23.22
+        }
+    }
+
+    shadow_edit1 = {
+        "device_id": "23121",
+        "shadow_metadata": {
+            "percent": 0
+        },
+        "alert_level": 32,
+        "container": 1,
+        "alias": "edited shadow1",
+        "auto_order_store": "",
+        "product_metadata": {
+            "product_name": "money",
+            "product_image": "url",
+            "product_quantity": 2,
+            "product_price": 23.22
+        }
+    }
+
+    family_info = {
+        "address_line1": "he",
+        "address_line2": "ll",
+        "city": "evanston",
+        "state": "il",
+        "zip_code": 63127,
+        "phone": 1231231234,
+        "email": "niche@niche.io",
+        "name": "niche",
+    }
+
+    member_info = {
+        "email": "member@niche.io",
+        "first_name": "member",
+        "last_name": "member",
+        "password": "nicho"
     }
 
 
@@ -68,27 +126,43 @@ class DeviceTests(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_device_shadow_creation(self):
-        sample_niche = self.app.post('/device/register', data=json.dumps(self.shadow_cash))
-        self.assertEqual(201, sample_niche.status_code)
-        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['cash']}))
-        self.assertEqual(200, got_cash.status_code)
-
     def test_invalid_device_shadow(self):
         bad_niche_id = self.app.post('/device/register', data=json.dumps({"wow":"hi"}))
         self.assertEqual(400, bad_niche_id.status_code)
 
-    def test_device_data_stamp_creation_and_get_all(self):
-        sample_niche1 = self.app.post('/device/register', data=json.dumps(self.shadow_cash))
-        self.assertEqual(201, sample_niche1.status_code)
-        sample_niche2 = self.app.post('/device/register', data=json.dumps(self.shadow_money))
-        self.assertEqual(201, sample_niche2.status_code)
+    def test_niche_register_claim_stamp(self):
 
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "cash", "metadata":{"battery": 23, "percentage": 12 }}))
+        family = self.app.post('/family/register', data=json.dumps(self.family_info))
+        self.assertEqual(201, family.status_code)
+        family_data = json.loads(family.data.decode())
+
+        self.member_info["invite_code"] = family_data['response']['member']
+        member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        self.assertEqual(201, member.status_code)
+
+        token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
+        self.assertEqual(200, token.status_code)
+        member_token = json.loads(token.data.decode())['token']
+
+        #### user regis
+
+        sample_niche = self.app.post('/device/register', data=json.dumps(self.shadow_factory_init))
+        self.assertEqual(201, sample_niche.status_code)
+        sample_niche = self.app.post('/device/register', data=json.dumps(self.shadow_factory_init1))
+        self.assertEqual(201, sample_niche.status_code)
+        claimed_niche = self.app.post('/niche', 
+            data=json.dumps(self.shadow_claim), 
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(200, claimed_niche.status_code)
+
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percentage": 12 }}))
         self.assertEqual(201, sample_stamp.status_code)
 
-        # updates initially -- case n
-        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['cash']}))
+        # stamp initially -- case n
+        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
         self.assertEqual(200, got_cash.status_code)
         cash_data = json.loads(got_cash.data.decode())
         self.assertEqual(12, cash_data['response'][0]['shadow_metadata']['percentage'])
@@ -98,19 +172,38 @@ class DeviceTests(unittest.TestCase):
         all_stamps_data = json.loads(all_stamps.data.decode())
         self.assertEqual(1, len(all_stamps_data['response']))
 
-        # updates -- case n + 1
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "cash", "metadata":{"battery": 23, "percentage": 23 }}))
+        # stamp -- case n + 1
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percentage": 23 }}))
         self.assertEqual(201, sample_stamp.status_code)
-        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['cash']}))
+        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
         self.assertEqual(200, got_cash.status_code)
         cash_data = json.loads(got_cash.data.decode())
         self.assertEqual(23, cash_data['response'][0]['shadow_metadata']['percentage'])
 
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "money", "metadata":{"battery": 23, "percentage": 12 }}))
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "23121", "metadata":{"battery": 23, "percentage": 12 }}))
         self.assertEqual(201, sample_stamp.status_code)
 
         all_stamps = self.app.get('/device')
         self.assertEqual(200, all_stamps.status_code)
         all_stamps_data = json.loads(all_stamps.data.decode())
         self.assertEqual(3, len(all_stamps_data['response']))
+
+        get_trial1 = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
+        self.assertEqual(200, get_trial1.status_code)
+        cash_data = json.loads(get_trial1.data.decode())
+        self.assertEqual("monay", cash_data['response'][0]['alias'])
+
+        # edit niche_info
+        claimed_niche = self.app.put('/niche', 
+            data=json.dumps(self.shadow_edit), 
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(200, claimed_niche.status_code)
+
+        get_trial1 = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
+        self.assertEqual(200, get_trial1.status_code)
+        cash_data = json.loads(get_trial1.data.decode())
+        self.assertEqual("edited shadow", cash_data['response'][0]['alias'])
 
