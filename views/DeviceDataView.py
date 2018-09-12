@@ -82,12 +82,11 @@ class DeviceDataView(MethodView):
 
     @classmethod
     def get_niches(cls):
-        data = json.loads(request.data.decode('utf-8'))
-        req_params = ['niche_ids']
-        if not ReqParser.check_body(data, req_params):
-            return json.dumps({"error_message": "ill-formed request"}), 400
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
-        error_message, status, response = DeviceDataController.get_shadows(data['niche_ids'])
+        error_message, status, response = DeviceDataController.get_shadows(fam_id)
 
         if error_message:
             return json.dumps({"error_message": error_message}), status

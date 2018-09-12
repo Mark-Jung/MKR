@@ -50,3 +50,7 @@ class DeviceShadowModel(db.Model, BaseModel):
     def find_by_device_id(cls, device_id):
         return cls.query.filter_by(device_id=device_id).first()
 
+    @classmethod
+    def filter_by_fam_id(cls, fam_id):
+        return cls.query.filter_by(fam_id=fam_id).all()
+

@@ -43,15 +43,12 @@ def checkout():
 def create_niche():
     return DeviceDataView.register_device()
 
-@app.route('/device', methods=['GET', 'POST'])
+@app.route('/device', methods=['POST'])
 @cross_origin()
 def collect_data():
-    if request.method == 'GET':
-        return DeviceDataView.get_all()
-    elif request.method == 'POST':
-        return DeviceDataView.collect_data()
+    return DeviceDataView.collect_data()
 
-@app.route('/dashboard', methods=['POST'])
+@app.route('/dashboard', methods=['GET'])
 @cross_origin()
 def load_dashboard():
     return DeviceDataView.get_niches()

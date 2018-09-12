@@ -134,14 +134,14 @@ class DeviceTests(unittest.TestCase):
 
         # create member
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
-        member_token = json.loads(member.data.decode())['token']
+        admin_token = json.loads(member.data.decode())['token']
         self.assertEqual(201, member.status_code)
 
         # verify email for member
         verify = self.app.post('/verify',
             data=json.dumps({"verification_code": "test"}),
             headers=dict(
-                Authorization="Bearer " + member_token,
+                Authorization="Bearer " + admin_token,
                 content_type="application/json"
             ))
         self.assertEqual(200, verify.status_code)
@@ -150,17 +150,13 @@ class DeviceTests(unittest.TestCase):
         family = self.app.post('/family/register',
             data=json.dumps(self.family_info),
             headers=dict(
-                Authorization="Bearer " + member_token,
+                Authorization="Bearer " + admin_token,
                 content_type="application/json"
             ))
         self.assertEqual(201, family.status_code)
         family_invite = json.loads(family.data.decode())['response']
         admin_invite = family_invite['admin']
         member_invite = family_invite['member']
-
-        # signin
-        token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
-        self.assertEqual(200, token.status_code)
 
         sample_niche = self.app.post('/device/register', data=json.dumps(self.shadow_factory_init))
         self.assertEqual(201, sample_niche.status_code)
@@ -169,7 +165,7 @@ class DeviceTests(unittest.TestCase):
         claimed_niche = self.app.post('/niche', 
             data=json.dumps(self.shadow_claim), 
             headers=dict(
-                Authorization="Bearer " + member_token,
+                Authorization="Bearer " + admin_token,
                 content_type= "application/json"
             ))
         self.assertEqual(200, claimed_niche.status_code)
@@ -178,48 +174,46 @@ class DeviceTests(unittest.TestCase):
         self.assertEqual(201, sample_stamp.status_code)
 
         # stamp initially -- case n
-        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
-        self.assertEqual(200, got_cash.status_code)
-        cash_data = json.loads(got_cash.data.decode())
-        self.assertEqual(12, cash_data['response'][0]['shadow_metadata']['percentage'])
+        dashboard = self.app.get('/dashboard', headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type= "application/json"
+            ))
+        dashboard_data = json.loads(dashboard.data.decode())
+        self.assertEqual(200, dashboard.status_code)
+        self.assertEqual(1, len(dashboard_data['response']))
+        self.assertEqual(12, dashboard_data['response'][0]['shadow_metadata']['percentage'])
 
-        all_stamps = self.app.get('/device')
-        self.assertEqual(200, all_stamps.status_code)
-        all_stamps_data = json.loads(all_stamps.data.decode())
-        self.assertEqual(1, len(all_stamps_data['response']))
 
         # stamp -- case n + 1
         sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percentage": 23 }}))
         self.assertEqual(201, sample_stamp.status_code)
-        got_cash = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
-        self.assertEqual(200, got_cash.status_code)
-        cash_data = json.loads(got_cash.data.decode())
-        self.assertEqual(23, cash_data['response'][0]['shadow_metadata']['percentage'])
+        dashboard = self.app.get('/dashboard', headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type= "application/json"
+            )) 
+        dashboard_data = json.loads(dashboard.data.decode())
+        self.assertEqual(200, dashboard.status_code)
+        self.assertEqual(1, len(dashboard_data['response']))
+        self.assertEqual(23, dashboard_data['response'][0]['shadow_metadata']['percentage'])
 
         sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "23121", "metadata":{"battery": 23, "percentage": 12 }}))
         self.assertEqual(201, sample_stamp.status_code)
-
-        all_stamps = self.app.get('/device')
-        self.assertEqual(200, all_stamps.status_code)
-        all_stamps_data = json.loads(all_stamps.data.decode())
-        self.assertEqual(3, len(all_stamps_data['response']))
-
-        get_trial1 = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
-        self.assertEqual(200, get_trial1.status_code)
-        cash_data = json.loads(get_trial1.data.decode())
-        self.assertEqual("monay", cash_data['response'][0]['alias'])
 
         # edit niche_info
         claimed_niche = self.app.put('/niche', 
             data=json.dumps(self.shadow_edit), 
             headers=dict(
-                Authorization="Bearer " + member_token,
+                Authorization="Bearer " + admin_token,
                 content_type= "application/json"
             ))
         self.assertEqual(200, claimed_niche.status_code)
 
         get_trial1 = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
-        self.assertEqual(200, get_trial1.status_code)
-        cash_data = json.loads(get_trial1.data.decode())
-        self.assertEqual("edited shadow", cash_data['response'][0]['alias'])
-
+        dashboard = self.app.get('/dashboard', headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type= "application/json"
+            )) 
+        dashboard_data = json.loads(dashboard.data.decode())
+        self.assertEqual(200, dashboard.status_code)
+        self.assertEqual(1, len(dashboard_data['response']))
+        self.assertEqual("edited shadow", dashboard_data['response'][0]['alias'])
