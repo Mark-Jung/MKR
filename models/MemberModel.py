@@ -18,16 +18,17 @@ class MemberModel(db.Model, BaseModel):
     last_name = db.Column(db.String(255))
     authority = db.Column(db.Integer)
     password = db.Column(db.String(255))
+    verified = db.Column(db.Boolean)
 
     fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
 
-    def __init__(self, first_name, last_name, email, fam_id, authority, password):
+    def __init__(self, first_name, last_name, email, password):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
-        self.fam_id = fam_id
-        self.authority = authority
         self.password = Bcrypt().generate_password_hash(password).decode()
+
+        self.verified = False
 
     def json(self):
         return {

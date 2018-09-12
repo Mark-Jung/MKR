@@ -36,14 +36,18 @@ class Emailer():
         s.quit()
 
     @classmethod
-    async def signup(cls, email, name, admin_invite, member_invite, fam_name):
-        if admin_invite == "":
-            body = BodyBuilder.signup_joinfam(name, fam_name)
-        else:
-            body = BodyBuilder.signup_createfam(name, admin_invite, member_invite, fam_name)
+    async def join_fam(cls, email, name, fam_name):
+        body = BodyBuilder.signup_joinfam(name, fam_name)
         HTML_BODY = MIMEText(body, 'html')
 
         cls.send_email("Welcome to Niche!", HTML_BODY, [email]) 
+    
+    @classmethod 
+    async def create_fam(cls, email, name, fam_name, admin_invite, member_invite):
+        body = BodyBuilder.signup_createfam(name, admin_invite, member_invite, fam_name)
+        HTML_BODY = MIMEText(body, 'html')
+
+        cls.send_email("Welcome to Niche!", HTML_BODY, [email])
  
     @classmethod
     async def invite(cls):
@@ -57,3 +61,9 @@ class Emailer():
 
         cls.send_email("GO FULFILL THE NICHE ORDER!!!!!!!", HTML_BODY, recipients)
         
+    @classmethod
+    async def send_verification(cls, email, name, code):
+        body = BodyBuilder.verification(name, code)
+        HTML_BODY = MIMEText(body, 'html')
+
+        cls.send_email("Verify your account -Niche", HTML_BODY, [email])

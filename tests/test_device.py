@@ -132,19 +132,35 @@ class DeviceTests(unittest.TestCase):
 
     def test_niche_register_claim_stamp(self):
 
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
-        self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
-
-        self.member_info["invite_code"] = family_data['response']['member']
+        # create member
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        member_token = json.loads(member.data.decode())['token']
         self.assertEqual(201, member.status_code)
 
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # create family
+        family = self.app.post('/family/register',
+            data=json.dumps(self.family_info),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(201, family.status_code)
+        family_invite = json.loads(family.data.decode())['response']
+        admin_invite = family_invite['admin']
+        member_invite = family_invite['member']
+
+        # signin
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
         self.assertEqual(200, token.status_code)
-        member_token = json.loads(token.data.decode())['token']
-
-        #### user regis
 
         sample_niche = self.app.post('/device/register', data=json.dumps(self.shadow_factory_init))
         self.assertEqual(201, sample_niche.status_code)

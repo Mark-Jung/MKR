@@ -11,11 +11,10 @@ class CheckoutView(MethodView):
     
     @classmethod
     def checkout(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), status
+
         data = json.loads(request.data.decode('utf-8'))
         req_params = ['total', 'items']
         req_params_item = ['store', 'price', 'url', 'name']

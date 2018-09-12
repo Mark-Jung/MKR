@@ -27,7 +27,14 @@ class UserTests(unittest.TestCase):
         "email": "niche@niche.io",
         "first_name": "niche",
         "last_name": "nichel",
-        "password": "nicho"
+        "password": "nicolo"
+    }
+
+    member_info1 = {
+        "email": "member1@niche.io",
+        "first_name": "niche",
+        "last_name": "nichel",
+        "password": "nicolo"
     }
 
 
@@ -51,29 +58,56 @@ class UserTests(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def test_family_creation(self):
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
-        self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
-
-    def test_member_creation(self):
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
-        self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
-
-        self.member_info["invite_code"] = family_data['response']['admin']
+    def test_member_family_signupflow(self):
+        # create member
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
+        member_token = json.loads(member.data.decode())['token']
         self.assertEqual(201, member.status_code)
 
-    def test_member_signin(self):
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # create family
+        family = self.app.post('/family/register',
+            data=json.dumps(self.family_info),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
         self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
+        family_invite = json.loads(family.data.decode())['response']
+        admin_invite = family_invite['admin']
+        member_invite = family_invite['member']
 
-        self.member_info["invite_code"] = family_data['response']['admin']
-        member = self.app.post('/member/register', data=json.dumps(self.member_info))
-        self.assertEqual(201, member.status_code)
-
+        # signin
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
         self.assertEqual(200, token.status_code)
 
+        # create another member
+        member = self.app.post('/member/register', data=json.dumps(self.member_info1))
+        member_token = json.loads(member.data.decode())['token']
+        self.assertEqual(201, member.status_code)
+
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # join family as member
+        join = self.app.post('/family/join',
+            data=json.dumps({"invite_code": member_invite}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, join.status_code)
