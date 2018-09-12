@@ -22,13 +22,14 @@ class BodyBuilder():
         for product in items:
             body += """
                 <br>
+                <div style="margin-top: 3px;">Item ID(in niche database): {id} </div>
                 <div style="margin-top: 3px;">Item Name: {name} </div>
                 <div style="margin-top: 3px;">Item Store: {store} </div>
                 <div style="margin-top: 3px;">Item Price: {price} </div>
                 <div style="margin-top: 3px;">Item Image below </div>
                 <img style="width: 200px; height: 110px;" src="{url}" alt="item picture" title="picture"/>
                 <br>
-            """.format(store=product['store'], price='%.2f' % float(product['price']/100), url=product['url'], name=product['name'])
+            """.format(id=product['id'], store=product['in_store'], price='%.2f' % float(product['item_price']/100), url=product['item_image'], name=product['item_name'])
         body += """
             </body>
         </html>"""
