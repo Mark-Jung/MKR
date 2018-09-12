@@ -38,6 +38,13 @@ class ListToCartTests(unittest.TestCase):
         "password": "memberoo"
     }
 
+    member_info1 = {
+        "email": "member1@niche.io",
+        "first_name": "niche",
+        "last_name": "nichel",
+        "password": "nicolo"
+    }
+
     list_info = {
         "alias": "cat",
         "in_store" : "Walmart"
@@ -131,24 +138,58 @@ class ListToCartTests(unittest.TestCase):
     
     def test_list_CRUD(self):
         # both admin and member should be able to add item to the list.
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
-        self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
-
-        self.admin_info["invite_code"] = family_data['response']['admin']
-        self.member_info["invite_code"] = family_data['response']['member']
-        admin = self.app.post('/member/register', data=json.dumps(self.admin_info))
+        # create member
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
-        self.assertEqual(201, admin.status_code)
+        admin_token = json.loads(member.data.decode())['token']
         self.assertEqual(201, member.status_code)
 
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # create family
+        family = self.app.post('/family/register',
+            data=json.dumps(self.family_info),
+            headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(201, family.status_code)
+        family_invite = json.loads(family.data.decode())['response']
+        admin_invite = family_invite['admin']
+        member_invite = family_invite['member']
+
+        # signin
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
         self.assertEqual(200, token.status_code)
-        member_token = json.loads(token.data.decode())['token']
 
-        token = self.app.post('/signin', data=json.dumps({"email":self.admin_info["email"], "password":self.admin_info["password"]}))
-        self.assertEqual(200, token.status_code)
-        admin_token = json.loads(token.data.decode())['token']
+        # create another member
+        member = self.app.post('/member/register', data=json.dumps(self.member_info1))
+        member_token = json.loads(member.data.decode())['token']
+        self.assertEqual(201, member.status_code)
+
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # join family as member
+        join = self.app.post('/family/join',
+            data=json.dumps({"invite_code": member_invite}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, join.status_code)
         ### setup till here
         # adding to list as admin and member Create check
         admin_add_to_list = self.app.post('/listtocart/list', 
@@ -267,24 +308,58 @@ class ListToCartTests(unittest.TestCase):
 
 
     def test_cart_CRUD(self):
-        family = self.app.post('/family/register', data=json.dumps(self.family_info))
-        self.assertEqual(201, family.status_code)
-        family_data = json.loads(family.data.decode())
-
-        self.admin_info["invite_code"] = family_data['response']['admin']
-        self.member_info["invite_code"] = family_data['response']['member']
-        admin = self.app.post('/member/register', data=json.dumps(self.admin_info))
+        # create member
         member = self.app.post('/member/register', data=json.dumps(self.member_info))
-        self.assertEqual(201, admin.status_code)
+        admin_token = json.loads(member.data.decode())['token']
         self.assertEqual(201, member.status_code)
 
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # create family
+        family = self.app.post('/family/register',
+            data=json.dumps(self.family_info),
+            headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(201, family.status_code)
+        family_invite = json.loads(family.data.decode())['response']
+        admin_invite = family_invite['admin']
+        member_invite = family_invite['member']
+
+        # signin
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
         self.assertEqual(200, token.status_code)
-        member_token = json.loads(token.data.decode())['token']
 
-        token = self.app.post('/signin', data=json.dumps({"email":self.admin_info["email"], "password":self.admin_info["password"]}))
-        self.assertEqual(200, token.status_code)
-        admin_token = json.loads(token.data.decode())['token']
+        # create another member
+        member = self.app.post('/member/register', data=json.dumps(self.member_info1))
+        member_token = json.loads(member.data.decode())['token']
+        self.assertEqual(201, member.status_code)
+
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+
+        # join family as member
+        join = self.app.post('/family/join',
+            data=json.dumps({"invite_code": member_invite}),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, join.status_code)
 
         admin_add_to_list = self.app.post('/listtocart/list', 
         data=json.dumps(self.list_info), 
