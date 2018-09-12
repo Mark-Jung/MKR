@@ -10,11 +10,9 @@ class ListToCartView(MethodView):
    
     @classmethod
     def delete_list_to_cart(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
         req_params = ["list_to_cart_id"]
@@ -28,11 +26,9 @@ class ListToCartView(MethodView):
 
     @classmethod
     def edit_list_to_cart(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
         
@@ -47,11 +43,9 @@ class ListToCartView(MethodView):
 
     @classmethod
     def switch_list_to_cart(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
 
@@ -69,11 +63,9 @@ class ListToCartView(MethodView):
 
     @classmethod
     def get_cart(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         error_message, status, response = ListToCartController.get_cart(fam_id)
         if error_message:
@@ -82,11 +74,9 @@ class ListToCartView(MethodView):
    
     @classmethod
     def get_list(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         error_message, status, response = ListToCartController.get_list(fam_id)
         if error_message:
@@ -97,11 +87,9 @@ class ListToCartView(MethodView):
 
     @classmethod
     def register_list_to_cart(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
         req_params = ["alias", "in_store"]

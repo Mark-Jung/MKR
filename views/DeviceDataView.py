@@ -10,11 +10,10 @@ from utils.auth import Auth
 class DeviceDataView(MethodView):
     @classmethod
     def claim_niche(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
+        
 
         data = json.loads(request.data.decode('utf-8'))
         req_params = ['device_id', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']
@@ -43,11 +42,9 @@ class DeviceDataView(MethodView):
 
     @classmethod
     def edit_niche(cls):
-        member_id, fam_id = Auth.whoisit(request.headers)
-        if member_id < 0:
-            return json.dumps({"error_message": "ill-formed request"}), 400
-        elif member_id == 0:
-            return json.dumps({"error_message": "Not Authorized"}), 403
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
         req_params = ['device_id', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']

@@ -40,7 +40,6 @@ def checkout():
     return CheckoutView.checkout()
 
 @app.route('/device/register', methods=['POST'])
-@cross_origin()
 def create_niche():
     return DeviceDataView.register_device()
 
@@ -60,6 +59,10 @@ def load_dashboard():
 @app.route('/family/register', methods=['POST'])
 def register_family():
     return FamilyView.register_family()
+
+@app.route('/family/join', methods=['POST'])
+def join_family():
+    return FamilyView.join_family()
 
 @app.route('/listtocart', methods=['DELETE', 'POST', 'PUT'])
 def list_to_cart():
@@ -93,10 +96,13 @@ def user_niche_actions():
     elif request.method == 'PUT':
         return DeviceDataView.edit_niche()
 
-
 @app.route('/signin', methods=['POST'])
 def signin():
     return MemberView.signin()
+
+@app.route('/verify', methods=['POST'])
+def verify():
+    return MemberView.verify_member()
 
 
 class ModelView(sqla.ModelView):
