@@ -66,7 +66,7 @@ class ListToCartTests(unittest.TestCase):
         "in_store": "Walmart",
         "item_name": "cat",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-        "item_price": "1200",
+        "item_price": 1200,
         "item_quantity": 24,
         "list_to_cart_id": 3,
     }
@@ -77,7 +77,7 @@ class ListToCartTests(unittest.TestCase):
         "in_store": "Walmart",
         "item_name": "cat",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-        "item_price": "1200",
+        "item_price": 1200,
         "item_quantity": 24,
         "list_to_cart_id": 1,
     }
@@ -88,7 +88,7 @@ class ListToCartTests(unittest.TestCase):
         "in_store": "Walmart",
         "item_name": "cat2",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-        "item_price": "1200",
+        "item_price": 1200,
         "item_quantity": 24,
         "list_to_cart_id": 2,
     }
@@ -99,7 +99,7 @@ class ListToCartTests(unittest.TestCase):
         "in_store": "Walmart",
         "item_name": "cat2",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-        "item_price": "1200",
+        "item_price": 1200,
         "item_quantity": 24,
         "list_to_cart_id": 2,
     }
@@ -110,7 +110,7 @@ class ListToCartTests(unittest.TestCase):
         "in_store": "Walmart",
         "item_name": "cat2",
         "item_image": "https://images.huffingtonpost.com/2016-05-30-1464600256-1952992-cutecatnames-thumb.jpg",
-        "item_price": "1200",
+        "item_price": 1200,
         "item_quantity": 24,
         "list_to_cart_id": 2,
     }

@@ -59,8 +59,6 @@ class ListToCartView(MethodView):
             return json.dumps({"error_message": error_message}), status
         return json.dumps({"response": "Success!"}), status
 
-
-
     @classmethod
     def get_cart(cls):
         err, status, member_id, fam_id = Auth.whoisit(request.headers)
@@ -82,8 +80,6 @@ class ListToCartView(MethodView):
         if error_message:
             return json.dumps({"error_message": error_message}), status
         return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
-
-    
 
     @classmethod
     def register_list_to_cart(cls):

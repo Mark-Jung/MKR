@@ -17,14 +17,10 @@ class CheckoutView(MethodView):
 
         data = json.loads(request.data.decode('utf-8'))
         req_params = ['total', 'items']
-        req_params_item = ['store', 'price', 'url', 'name']
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
-        for item in data['items']:
-            if not ReqParser.check_body(item, req_params_item):
-                return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = CheckoutController.checkout(member_id, data)
+        error_message, status = CheckoutController.checkout(member_id, fam_id, data['total'], data['items'])
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
