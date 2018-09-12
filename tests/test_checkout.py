@@ -70,9 +70,14 @@ class CheckoutTests(unittest.TestCase):
         "list_to_cart_id": 2,
     }
 
+    checkout_info_invalid = {
+        "total": 0,
+        "items": [2]
+    }
+
     checkout_info = {
-        "total": 2400,
-        "items": [1, 2]
+        "total": 0,
+        "items": []
     }
 
 
@@ -194,7 +199,7 @@ class CheckoutTests(unittest.TestCase):
 
         # invalid_checkout - insufficient data
         checkout = self.app.post('/checkout', 
-        data=json.dumps(self.checkout_info), 
+        data=json.dumps(self.checkout_info_invalid), 
         headers=dict(
                 Authorization="Bearer " + admin_token,
                 content_type= "application/json"
@@ -217,6 +222,22 @@ class CheckoutTests(unittest.TestCase):
                 content_type= "application/json"
             ))
         self.assertEqual(200, checkout.status_code)
+
+        # get the ids of the list_to_cart items you want to checkout
+        get_cart = self.app.get('/listtocart/cart',
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type= "application/json"
+            ))
+        self.assertEqual(200, get_cart.status_code)
+        total = 0
+        items = []
+        get_cart_data = json.loads(get_cart.data.decode())
+        for each in get_cart_data['response']:
+            total += each['item_price']
+            items.append(each['id'])
+        self.checkout_info['items'] = items
+        self.checkout_info['total'] = total
 
         checkout = self.app.post('/checkout', 
         data=json.dumps(self.checkout_info), 
