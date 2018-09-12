@@ -1,0 +1,96 @@
+from scipy.spatial import distance as dist
+from imutils import perspective
+from imutils import contours
+import numpy as np
+import imutils
+import cv2
+import time
+def midpo(ptA, ptB):
+	return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
+
+
+start_time = time.time()
+img_file = '/Users/berkayozen/Desktop/Niche/IMG-0031.jpg'
+gray = cv2.imread(img_file)
+
+gray = cv2.cvtColor(gray, cv2.COLOR_BGR2GRAY)
+gray = cv2.GaussianBlur(gray, (3, 3),0)
+gray = cv2.resize(gray, (800, 800))
+
+edged = cv2.Canny(gray, 60, 100)
+edged = cv2.dilate(edged, None, iterations=1)
+edged = cv2.erode(edged, None, iterations=1)
+edged = cv2.dilate(edged, None, iterations=1)
+edged = cv2.erode(edged, None, iterations=1)
+
+
+
+# find contours in the edge map
+cnts = cv2.findContours(edged, cv2.RETR_TREE,
+                        cv2.CHAIN_APPROX_SIMPLE)
+
+
+cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+for contour in cnts:
+    if cv2.contourArea(contour) < 1000:
+        continue
+    (cnts, _) = contours.sort_contours(cnts)
+    pixelsPerMetric = None
+k = 0
+for c in cnts:
+    if cv2.contourArea(c) < 1000:
+        continue
+    k = k + 1
+    if k > 1 and k < 4:
+        orig = gray.copy()
+        box = cv2.minAreaRect(c)
+        box = cv2.BoxPoints(box) if imutils.is_cv2() else cv2.boxPoints(box)
+        box = np.array(box, dtype="int")
+        box = perspective.order_points(box)
+        cv2.drawContours(orig, [box.astype("int")], -1, (0, 255, 0), 8)
+
+        for (x, y) in box:
+            cv2.circle(orig, (int(x), int(y)), 5, (0, 0, 255), -1)
+
+        (topl, topr, bottomr, bottoml) = box
+        (topX, topY) = midpo(topl, topr)
+        (bottomX, bottomY) = midpo(bottoml, bottomr)
+
+        (topbottomlX, topbottomlY) = midpo(topl, bottoml)
+        (topbottomrX, topbottomrY) = midpo(topr, bottomr)
+        cv2.circle(orig, (int(topX), int(topY)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(bottomX), int(bottomY)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(topbottomlX), int(topbottomlY)), 5, (255, 0, 0), -1)
+        cv2.circle(orig, (int(topbottomrX), int(topbottomrY)), 5, (255, 0, 0), -1)
+
+        cv2.line(orig, (int(topX), int(topY)), (int(bottomX), int(bottomY)),
+                (255, 0, 255), 6)
+        cv2.line(orig, (int(topbottomlX), int(topbottomlY)), (int(topbottomrX), int(topbottomrY)),
+                (255, 0, 255), 6)
+
+        dH = dist.euclidean((topX, topY), (bottomX, bottomY))
+        dW = dist.euclidean((topbottomlX, topbottomlY), (topbottomrX, topbottomrY))
+
+
+        if pixelsPerMetric is None:
+            pixelsPerMetric = dW / 5
+        if k == 2:
+            dimH = (dH / pixelsPerMetric)
+            dimW = (dW / pixelsPerMetric)
+        else:
+            dimH = (dH / pixelsPerMetric)
+            dimW = (dW / pixelsPerMetric)
+
+        if cv2.contourArea(c) < 3500:
+            continue
+
+        cv2.putText(orig, "{:.1f}in".format(dimW),
+                    (int(topX -15), int(topY - 10)), cv2.FONT_HERSHEY_SIMPLEX,
+                    1.50, (2, 2, 255), 3)
+        cv2.putText(orig, "{:.1f}in".format(dimH),
+                    (int(topbottomrX + 10), int(topbottomrY)), cv2.FONT_HERSHEY_SIMPLEX,
+                    1.50, (2, 2, 255), 3)
+        print 'Height =' , dimH
+elapsed_time = time.time()-start_time
+print 'Elapsed Time =', elapsed_time
