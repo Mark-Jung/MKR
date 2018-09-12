@@ -14,7 +14,7 @@ class DeviceDataController():
             cls.logger.exception("Tried to add a stamp of a device that doesn't exist")
             return "Invalid Request", 400
         
-        if target_device.fam_id != 0 and target_device.fam_id != fam_id:
+        if target_device.fam_id and target_device.fam_id != fam_id:
             cls.logger.exception("Tried to claim someone else's niche device")
             return "Invalid Request", 400
         
@@ -32,8 +32,6 @@ class DeviceDataController():
 
         return "", 200
     
-        
-
     @classmethod
     def collect_data(cls, device_id, metadata):
         target_device = DeviceShadowModel.find_by_device_id(device_id)
@@ -56,7 +54,6 @@ class DeviceDataController():
                 cls.logger.exception("Error while saving most recent")
 
         return "", 201
-
 
     @classmethod
     def create_shadow(cls, device_id):
@@ -107,13 +104,7 @@ class DeviceDataController():
         return "", 200, all_device_data
 
     @classmethod
-    def get_shadows(cls, shadow_ids):
-        result = []
-        for shadow_id in shadow_ids:
-            target_shadow = DeviceShadowModel.find_by_device_id(shadow_id)
-            if target_shadow:
-                result.append(target_shadow)
-            else:
-                return "Ill-formed Request", 400, None
-        return "", 200, result
+    def get_shadows(cls, fam_id):
+        target_shadow = DeviceShadowModel.filter_by_fam_id(fam_id)
+        return "", 200, target_shadow
         
