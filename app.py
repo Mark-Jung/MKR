@@ -44,12 +44,10 @@ def create_niche():
     return DeviceDataView.register_device()
 
 @app.route('/device', methods=['POST'])
-@cross_origin()
 def collect_data():
     return DeviceDataView.collect_data()
 
 @app.route('/dashboard', methods=['GET'])
-@cross_origin()
 def load_dashboard():
     return DeviceDataView.get_niches()
 
@@ -60,6 +58,10 @@ def register_family():
 @app.route('/family/join', methods=['POST'])
 def join_family():
     return FamilyView.join_family()
+
+@app.route('/invite', methods=['POST'])
+def invite():
+    return FamilyView.invite_by_email()
 
 @app.route('/listtocart', methods=['DELETE', 'POST', 'PUT'])
 def list_to_cart():

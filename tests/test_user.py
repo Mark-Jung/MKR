@@ -37,6 +37,13 @@ class UserTests(unittest.TestCase):
         "password": "nicolo"
     }
 
+    invite_emails = {
+        "admin": ["gujung2022@test.edu"],
+        "member": ["gujung2022@test.edu"],
+    }
+
+
+
 
     ############################
     #### setup and teardown ####
@@ -84,6 +91,15 @@ class UserTests(unittest.TestCase):
         family_invite = json.loads(family.data.decode())['response']
         admin_invite = family_invite['admin']
         member_invite = family_invite['member']
+
+        # invite
+        invite = self.app.post('/invite',
+            data=json.dumps(self.invite_emails),
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, invite.status_code)
 
         # signin
         token = self.app.post('/signin', data=json.dumps({"email":self.member_info["email"], "password":self.member_info["password"]}))
