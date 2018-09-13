@@ -50,8 +50,15 @@ class Emailer():
         cls.send_email("Welcome to Niche!", HTML_BODY, [email])
  
     @classmethod
-    async def invite(cls):
-        pass
+    async def invite(cls, admin_invite, member_invite, fam_name, admins, members):
+        admin_body = BodyBuilder.invite(admin_invite, fam_name, "admin")
+        ADMIN_HTML = MIMEText(admin_body, 'html')
+
+        member_body = BodyBuilder.invite(member_invite, fam_name, "member")
+        MEMBER_HTML = MIMEText(member_body, 'html')
+
+        cls.send_email("Invitation to Niche", ADMIN_HTML, admins)
+        cls.send_email("Invitation to Niche", MEMBER_HTML, members)
                
     @classmethod 
     async def checkout(cls, total, member_name, family_name, items, checkout_id):

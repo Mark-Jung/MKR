@@ -64,6 +64,28 @@ class FamilyController():
         return new_invite
 
     @classmethod
+    def invite_by_email(cls, admins, members, fam_id):
+        fam = FamilyModel.find_by_id(fam_id)
+        if not fam:
+            cls.logger.exception("Somehow logged in without having a family...")
+            return "Ill-formed Request", 400
+        
+        if asyncio.get_event_loop().is_closed():
+            asyncio.set_event_loop(asyncio.new_event_loop())
+
+        loop = asyncio.get_event_loop()
+        
+        # send email to who registered
+        tasks = [
+            asyncio.ensure_future(Emailer.invite(fam.admin_invite, fam.member_invite, fam.name, admins, members))
+        ]
+        loop.run_until_complete(asyncio.wait(tasks))
+        loop.close()
+
+        return "", 200
+
+
+    @classmethod
     def join_family(cls, invite_code, member_id):
         family = FamilyModel.find_by_invite_admin(invite_code)
         member = MemberModel.find_by_id(member_id)
