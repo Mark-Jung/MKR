@@ -51,12 +51,12 @@ class MemberView(MethodView):
         return json.dumps({"response": "Success!"}), status 
 
     @classmethod
-    def update_token(cls):
+    def signin_by_token(cls):
         err, status, member_id, fam_id = Auth.whoisit(request.headers)
-        if err and member_id != 0:
+        if err and member_id == 0:
             return json.dumps({"error_message": err}), status
-        elif err:
-            return json.dumps({})
+        else:
+            return json.dumps({"response": err}), 200
         
         auth_header = headers.get('Authorization')
 
