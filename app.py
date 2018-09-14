@@ -16,11 +16,6 @@ from views.FamilyView import FamilyView
 from views.ListToCartView import ListToCartView
 from views.MemberView import MemberView
 
-from models.DeviceDataModel import DeviceDataModel
-from models.DeviceShadowModel import DeviceShadowModel
-
-from utils.parser import ReqParser
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -103,6 +98,18 @@ def signin():
 def verify():
     return MemberView.verify_member()
 
+"""
+Admin View imports and definitions
+"""
+# Model Imports
+from models.CheckoutModel import CheckoutModel
+from models.DeviceDataModel import DeviceDataModel
+from models.DeviceShadowModel import DeviceShadowModel
+from models.FamilyModel import FamilyModel
+from models.MemberModel import MemberModel
+from models.ListToCartModel import ListToCartModel
+from models.ProductModel import ProductModel
+from models.VerificationModel import VerificationModel
 
 class ModelView(sqla.ModelView):
     def is_accessible(self):
@@ -127,13 +134,49 @@ class DeviceDataAdminView(ModelView):
     column_default_sort = ('date_created', True)
 
 class DeviceShadowAdminView(ModelView):
-    column_list = ['device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'shadow_metadata', 'auto_order_store', 'product_metadata']
+    column_list = ['fam_id', 'device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'shadow_metadata', 'product_metadata']
     column_searchable_list = ['device_id', 'alert_level']
-    column_filters = ['device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'auto_order_store']
-    column_default_sort = ('date_created', True)
+    column_filters = ['fam_id', 'device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias']
+    column_default_sort = ('fam_id', True)
 
+class CheckoutAdminView(ModelView):
+    column_list = ['id', 'date_created', 'total', 'member_id']
+    column_filters = ['id', 'date_created', 'total', 'member_id']
+    column_default_sort = ('id', True)
+
+class FamilyAdminView(ModelView):
+    column_list = ['id', 'date_created', 'address_line1', 'address_line2', 'city', 'state','zip_code', 'name', 'phone', 'email', 'admin_invite', 'member_invite']
+    column_filters = ['id', 'email', 'name', 'phone', 'admin_invite', 'member_invite']
+    column_default_sort = ('id', True)
+
+class MemberAdminView(ModelView):
+    column_list = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
+    column_filters = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
+    column_default_sort = ('id', True)
+
+class ListToCartAdminView(ModelView):
+    column_list = ['id', 'date_created', 'alias', 'in_cart', 'in_store', 'adder', 'item_name', 'item_image', 'item_price', 'item_rating', 'item_quantity', 'fam_id']
+    column_filters = ['id', 'adder', 'alias', 'item_name', 'item_image', 'item_price', 'item_quantity', 'fam_id']
+    column_default_sort = ('id', True)
+
+class ProductAdminView(ModelView):
+    column_list = ['id', 'date_created', 'store', 'price', 'url', 'name', 'checkout_id']
+    column_filters = ['id', 'date_created', 'store', 'price', 'url', 'name', 'checkout_id']
+    column_default_sort = ('id', True)
+
+class VerificationAdminView(ModelView):
+    column_list = ['id', 'date_created', 'value', 'member_id']
+    column_filters = ['id', 'date_created', 'value', 'member_id']
+    column_default_sort = ('id', True)
+
+admin.add_view(CheckoutAdminView(CheckoutModel, db.session))
 admin.add_view(DeviceDataAdminView(DeviceDataModel, db.session))
 admin.add_view(DeviceShadowAdminView(DeviceShadowModel, db.session))
+admin.add_view(FamilyAdminView(FamilyModel, db.session))
+admin.add_view(ListToCartAdminView(ListToCartModel, db.session))
+admin.add_view(MemberAdminView(MemberModel, db.session))
+admin.add_view(ProductAdminView(ProductModel, db.session))
+admin.add_view(VerificationAdminView(VerificationModel, db.session))
 
 
 if __name__ == '__main__':

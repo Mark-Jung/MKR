@@ -15,7 +15,6 @@ class DeviceShadowModel(db.Model, BaseModel):
     alert_level = db.Column(db.Integer)
     container = db.Column(db.Integer)
     alias = db.Column(db.String)
-    auto_order_store = db.Column(db.String)
     product_metadata = db.Column(JsonEncodedDict)
 
     fam_id = db.Column(db.Integer)
@@ -28,7 +27,6 @@ class DeviceShadowModel(db.Model, BaseModel):
         self.alert_level = 0
         self.container = 0
         self.alias = ""
-        self.auto_order_store = ""
         self.product_metadata = {}
         self.fam_id = 0
 
@@ -42,7 +40,6 @@ class DeviceShadowModel(db.Model, BaseModel):
                 "alert_level": self.alert_level,
                 "container": self.container,
                 "alias": self.alias,
-                "auto_order_store": self.auto_order_store,
                 "product_metadata": self.product_metadata,
                 }
 
