@@ -76,8 +76,7 @@ class MemberModel(db.Model, BaseModel):
     @staticmethod
     def update_token(token):
         """
-        Decodes the access token and if the expiration date is within 14 days,
-        give them a 100 day extension
+        Decodes the access token and give them a 100 day extension
         """
         try:
             payload = jwt.decode(token, os.environ.get('SECRET', 'test'))
@@ -89,7 +88,7 @@ class MemberModel(db.Model, BaseModel):
                     )
             return jwt_bytes.decode('utf-8')
         except Exception as e:
-            return str(e)
+            raise Exception(str(e))
 
     @staticmethod
     def decode_token(token):

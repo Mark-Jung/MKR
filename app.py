@@ -94,6 +94,10 @@ def user_niche_actions():
 def signin():
     return MemberView.signin()
 
+@app.route('/update', methods=['GET'])
+def update_token():
+    return MemberView.update_token()
+
 @app.route('/verify', methods=['POST'])
 def verify():
     return MemberView.verify_member()

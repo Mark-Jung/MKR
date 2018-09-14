@@ -69,7 +69,16 @@ class MemberController():
                 return "Invalid combination", 403, None
         else:
             return "Ill-formed Request", 400, None
-    
+
+    @classmethod
+    def update_token(cls, token):
+        try:
+            updated_token = MemberModel.update_token(token)
+            return "", 200, updated_token
+        except:
+            cls.logger("Error in updating token")
+            return "Internal Server Error", 500, None
+
     @classmethod
     def verify_member(cls, verification, member_id):
         all_verifications = VerificationModel.filter_by_member_id(member_id)
