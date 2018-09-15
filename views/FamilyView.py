@@ -37,11 +37,11 @@ class FamilyView(MethodView):
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = FamilyController.join_family(data['invite_code'], member_id)
+        error_message, status, response = FamilyController.join_family(data['invite_code'], member_id)
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
-        return json.dumps({"response": "Success"}), status
+        return json.dumps({"response": response}), status
     
     @classmethod
     def register_family(cls):

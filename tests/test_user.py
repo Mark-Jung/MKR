@@ -127,3 +127,5 @@ class UserTests(unittest.TestCase):
                 content_type="application/json"
             ))
         self.assertEqual(200, join.status_code)
+        join_data = json.loads(join.data.decode())
+        self.assertEqual('niche', join_data['response'])
