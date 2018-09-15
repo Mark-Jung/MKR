@@ -101,7 +101,7 @@ class FamilyController():
                 authority = 50
             else:
                 cls.logger.exception("Invalid invite_code")
-                return "Ill-formed Request", 400
+                return "Ill-formed Request", 400, None
         member.authority = authority
         member.fam_id = fam_id
         member.save_to_db()
@@ -118,4 +118,4 @@ class FamilyController():
         loop.run_until_complete(asyncio.wait(tasks))
         loop.close()
 
-        return "", 200
+        return "", 200, family.name
