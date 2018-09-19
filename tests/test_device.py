@@ -93,13 +93,12 @@ class DeviceTests(unittest.TestCase):
         "city": "evanston",
         "state": "il",
         "zip_code": 63127,
-        "phone": 1231231234,
-        "email": "niche@niche.io",
         "name": "niche",
     }
 
     member_info = {
         "email": "member@niche.io",
+        "phone": "+17365331364",
         "first_name": "member",
         "last_name": "member",
         "password": "nicho"

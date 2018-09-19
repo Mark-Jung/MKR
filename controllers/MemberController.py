@@ -20,9 +20,12 @@ class MemberController():
         member_already = MemberModel.find_by_email(data['email'])
         if member_already:
             return "Ill-formed Reqeust", 400, None
+        member_already = MemberModel.find_by_phone(data['phone'])
+        if member_already:
+            return "Ill-formed Reqeust", 400, None
 
         try: 
-            new_member = MemberModel(data['first_name'], data['last_name'], data['email'], data['password'])
+            new_member = MemberModel(data['first_name'], data['last_name'], data['email'], data['phone'], data['password'])
 
             if os.environ.get("SECRET", "dev") == "dev":
                 rand_string = "test"

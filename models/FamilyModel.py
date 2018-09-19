@@ -17,7 +17,7 @@ class FamilyModel(db.Model, BaseModel):
     zip_code = db.Column(db.Integer)
 
     name = db.Column(db.String(255))
-    phone = db.Column(db.String(20))
+    phone = db.Column(db.String(100))
     email = db.Column(db.String(255))
 
     admin_invite = db.Column(db.String(100))

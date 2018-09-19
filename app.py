@@ -102,6 +102,10 @@ def signin_by_token():
 def verify():
     return MemberView.verify_member()
 
+@app.route('/feedback', methods=['POST'])
+def feedback():
+    return FeedbackView.record_feedback()
+
 """
 Admin View imports and definitions
 """

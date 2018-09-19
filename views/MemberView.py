@@ -11,7 +11,7 @@ class MemberView(MethodView):
     @classmethod
     def register_member(cls):
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ["first_name", "last_name", "email", "password"]
+        req_params = ["first_name", "last_name", "email", "password", "phone"]
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
