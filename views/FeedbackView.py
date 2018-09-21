@@ -15,8 +15,8 @@ class FeedbackView(MethodView):
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"})
 
-        error_message, status = FamilyController.invite_by_email(data['admin'], data['member'], fam_id)
+        error_message, status, response = FeedbackController.save_feedback()
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
-        return json.dumps({"response": "Success"}), status
+        return response, status

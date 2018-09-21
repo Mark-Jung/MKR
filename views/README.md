@@ -55,6 +55,6 @@ methods requiring token authentification will have this emoji beside it. :closed
         Gets all the items in the family's shopping cart
 
 ### For Twilio
-*   `/feedback` allowed methods [POST] :closed_lock_with_key:
+*   `/feedback` allowed methods [POST] 
     * POST
         Records the call from a user, alerting a few teammates. Requires auth.
