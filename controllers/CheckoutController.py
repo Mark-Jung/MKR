@@ -50,8 +50,11 @@ class CheckoutController():
     
         family = FamilyModel.find_by_id(fam_id)
         
-        if asyncio.get_event_loop().is_closed():
+        try:
+            loop = asyncio.get_event_loop()
+        except:
             asyncio.set_event_loop(asyncio.new_event_loop())
+        
         loop = asyncio.get_event_loop()
         # send email to deliver :)
         tasks = [asyncio.ensure_future(Emailer.checkout(total, member.first_name + ' ' + member.last_name, family.name, item_data, new_checkout.id))]

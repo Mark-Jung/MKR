@@ -1,3 +1,4 @@
+import asyncio
 import os
 import json
 
@@ -15,6 +16,7 @@ from views.DeviceDataView import DeviceDataView
 from views.FamilyView import FamilyView
 from views.ListToCartView import ListToCartView
 from views.MemberView import MemberView
+from views.FeedbackView import FeedbackView
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
@@ -53,6 +55,14 @@ def register_family():
 @app.route('/family/join', methods=['POST'])
 def join_family():
     return FamilyView.join_family()
+
+@app.route('/feedback', methods=['POST'])
+def respond_feedback():
+    return FeedbackView.respond_feedback()
+
+@app.route('/feedback/save', methods=['POST'])
+def save_feedback():
+    return FeedbackView.save_feedback()
 
 @app.route('/invite', methods=['POST'])
 def invite():
@@ -102,10 +112,6 @@ def signin_by_token():
 def verify():
     return MemberView.verify_member()
 
-@app.route('/feedback', methods=['POST'])
-def feedback():
-    return FeedbackView.record_feedback()
-
 """
 Admin View imports and definitions
 """
@@ -114,8 +120,9 @@ from models.CheckoutModel import CheckoutModel
 from models.DeviceDataModel import DeviceDataModel
 from models.DeviceShadowModel import DeviceShadowModel
 from models.FamilyModel import FamilyModel
-from models.MemberModel import MemberModel
+from models.FeedbackModel import FeedbackModel
 from models.ListToCartModel import ListToCartModel
+from models.MemberModel import MemberModel
 from models.ProductModel import ProductModel
 from models.VerificationModel import VerificationModel
 
@@ -157,14 +164,19 @@ class FamilyAdminView(ModelView):
     column_filters = ['id', 'email', 'name', 'phone', 'admin_invite', 'member_invite']
     column_default_sort = ('id', True)
 
-class MemberAdminView(ModelView):
-    column_list = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
-    column_filters = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
-    column_default_sort = ('id', True)
+class FeedbackAdminView(ModelView):
+    column_list = ['id', 'date_created', 'feedback_url', 'feedback_duration', 'transcription_url', 'member_id']
+    column_filters = ['id', 'date_created', 'feedback_url', 'feedback_duration', 'transcription_url', 'member_id']
+    column_default_sort = ('id', True) 
 
 class ListToCartAdminView(ModelView):
     column_list = ['id', 'date_created', 'alias', 'in_cart', 'in_store', 'adder', 'item_name', 'item_image', 'item_price', 'item_rating', 'item_quantity', 'fam_id']
     column_filters = ['id', 'adder', 'alias', 'item_name', 'item_image', 'item_price', 'item_quantity', 'fam_id']
+    column_default_sort = ('id', True)
+
+class MemberAdminView(ModelView):
+    column_list = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id', ]
+    column_filters = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
     column_default_sort = ('id', True)
 
 class ProductAdminView(ModelView):
@@ -181,6 +193,7 @@ admin.add_view(CheckoutAdminView(CheckoutModel, db.session))
 admin.add_view(DeviceDataAdminView(DeviceDataModel, db.session))
 admin.add_view(DeviceShadowAdminView(DeviceShadowModel, db.session))
 admin.add_view(FamilyAdminView(FamilyModel, db.session))
+admin.add_view(FeedbackAdminView(FeedbackModel, db.session))
 admin.add_view(ListToCartAdminView(ListToCartModel, db.session))
 admin.add_view(MemberAdminView(MemberModel, db.session))
 admin.add_view(ProductAdminView(ProductModel, db.session))

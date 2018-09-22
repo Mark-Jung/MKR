@@ -11,7 +11,7 @@ class MemberModel(db.Model, BaseModel):
     __tablename__ = "member"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     email = db.Column(db.String(255))
     phone = db.Column(db.String(100))

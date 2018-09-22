@@ -7,7 +7,7 @@ class ProductModel(db.Model, BaseModel):
     __tablename__ = "product"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     store = db.Column(db.String(255))
     price = db.Column(db.Integer)

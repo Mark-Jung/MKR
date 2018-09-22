@@ -8,7 +8,7 @@ class DeviceShadowModel(db.Model, BaseModel):
     __tablename__ = "deviceshadow"
 
     device_id = db.Column(db.String(255), primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_updated = db.Column(db.DateTime)
 
     shadow_metadata = db.Column(JsonEncodedDict)

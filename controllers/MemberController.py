@@ -19,10 +19,10 @@ class MemberController():
         # check if family with the same name exist
         member_already = MemberModel.find_by_email(data['email'])
         if member_already:
-            return "Ill-formed Reqeust", 400, None
+            return "Ill-formed Request", 400, None
         member_already = MemberModel.find_by_phone(data['phone'])
         if member_already:
-            return "Ill-formed Reqeust", 400, None
+            return "Ill-formed Request", 400, None
 
         try: 
             new_member = MemberModel(data['first_name'], data['last_name'], data['email'], data['phone'], data['password'])
@@ -43,11 +43,13 @@ class MemberController():
             cls.logger.exception("Error creating a member.")
             return "Internal Server Error", 500, None
 
-        if asyncio.get_event_loop().is_closed():
+        try:
+            loop = asyncio.get_event_loop()
+        except:
             asyncio.set_event_loop(asyncio.new_event_loop())
-
-        loop = asyncio.get_event_loop()
         
+        loop = asyncio.get_event_loop()
+
         # send verification code to who registered
         tasks = [
             asyncio.ensure_future(Emailer.send_verification(new_member.email, new_member.first_name, new_verification.value))

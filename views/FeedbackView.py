@@ -10,13 +10,18 @@ import json
 class FeedbackView(MethodView):
 
     @classmethod
-    def record_feedback(cls):
-        data = json.loads(request.data.decode('utf-8'))
-        if not ReqParser.check_body(data, req_params):
-            return json.dumps({"error_message": "ill-formed request"})
+    def respond_feedback(cls):
+        response, status= FeedbackController.respond_feedback()
+        return response, status
 
-        error_message, status, response = FeedbackController.save_feedback()
+    @classmethod
+    def save_feedback(cls):
+        # req_params = ['From', 'RecordingURL', 'RecordingDuration']
+        # if not ReqParser.check_body(request.values, req_params):
+        #     return json.dumps({"error_message": "ill-formed request"}), 400
+
+        error_message, status, response = FeedbackController.save_feedback(request.values['From'], request.values['RecordingUrl'], request.values['RecordingDuration'])
 
         if error_message:
-            return json.dumps({"error_message": error_message}), status
-        return response, status
+            return json.dumps({"error_message": error_message})
+        return json.dumps({"response": response}), status

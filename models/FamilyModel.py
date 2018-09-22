@@ -8,7 +8,7 @@ class FamilyModel(db.Model, BaseModel):
     __tablename__ = "family"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     address_line1 = db.Column(db.String(255))
     address_line2 = db.Column(db.String(255))
