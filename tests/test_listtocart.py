@@ -19,13 +19,12 @@ class ListToCartTests(unittest.TestCase):
         "city": "evanston",
         "state": "il",
         "zip_code": 63127,
-        "phone": 1231231234,
-        "email": "niche@niche.io",
         "name": "niche",
     }
 
     admin_info = {
         "email": "admin@niche.io",
+        "phone": "+17365331365",
         "first_name": "admin",
         "last_name": "admin",
         "password": "adminoh"
@@ -33,6 +32,7 @@ class ListToCartTests(unittest.TestCase):
 
     member_info = {
         "email": "member@niche.io",
+        "phone": "+17365331364",
         "first_name": "member",
         "last_name": "member",
         "password": "memberoo"
@@ -40,6 +40,7 @@ class ListToCartTests(unittest.TestCase):
 
     member_info1 = {
         "email": "member1@niche.io",
+        "phone": "+17365331363",
         "first_name": "niche",
         "last_name": "nichel",
         "password": "nicolo"

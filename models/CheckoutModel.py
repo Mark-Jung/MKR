@@ -7,7 +7,7 @@ class CheckoutModel(db.Model, BaseModel):
     __tablename__ = "checkout"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     total = db.Column(db.Integer)
     member_id = db.Column(db.Integer, db.ForeignKey('member.id'))

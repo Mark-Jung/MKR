@@ -11,9 +11,10 @@ class MemberModel(db.Model, BaseModel):
     __tablename__ = "member"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     email = db.Column(db.String(255))
+    phone = db.Column(db.String(100))
     first_name = db.Column(db.String(255))
     last_name = db.Column(db.String(255))
     authority = db.Column(db.Integer)
@@ -22,10 +23,11 @@ class MemberModel(db.Model, BaseModel):
 
     fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
 
-    def __init__(self, first_name, last_name, email, password):
+    def __init__(self, first_name, last_name, email, phone, password):
         self.first_name = first_name
         self.last_name = last_name
         self.email = email
+        self.phone = phone
         self.password = Bcrypt().generate_password_hash(password).decode()
 
         self.verified = False
@@ -42,6 +44,10 @@ class MemberModel(db.Model, BaseModel):
     @classmethod
     def find_by_email(cls, email):
         return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def find_by_phone(cls, phone):
+        return cls.query.filter_by(phone=phone).first()
 
     @classmethod
     def find_by_family(cls, fam_id):

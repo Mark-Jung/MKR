@@ -7,7 +7,7 @@ class VerificationModel(db.Model, BaseModel):
     __tablename__ = "verification"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     value = db.Column(db.String(255))
 

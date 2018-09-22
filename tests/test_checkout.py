@@ -19,19 +19,19 @@ class CheckoutTests(unittest.TestCase):
         "city": "evanston",
         "state": "il",
         "zip_code": 63127,
-        "phone": 1231231234,
-        "email": "niche@niche.io",
         "name": "niche",
     }
 
     member_info = {
         "email": "niche@niche.io",
+        "phone": "+17365331364",
         "first_name": "niche",
         "last_name": "nichel",
         "password": "nicho"
     }
 
     member_info1 = {
+        "phone": "+17365331363",
         "email": "member1@niche.io",
         "first_name": "niche",
         "last_name": "nichel",

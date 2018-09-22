@@ -9,7 +9,7 @@ class DeviceDataModel(db.Model, BaseModel):
 
     id = db.Column(db.Integer, primary_key=True)
     device_id = db.Column(db.String(255), db.ForeignKey('deviceshadow.device_id'))
-    date_created = db.Column(db.DateTime)
+    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     device_metadata = db.Column(JsonEncodedDict)
 
     def __init__(self, device_id, metadata):

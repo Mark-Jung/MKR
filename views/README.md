@@ -1,9 +1,10 @@
 # Views
 :octocat:
 Welcome to the views folder! In here, we have functions serving the endpoints directly. Much of the parsing for required argument goes here.
-This server's clients can be divided into two crowds: apps and iot devices.
+This server's clients can be divided into largely two crowds: apps and iot devices.
 
-Let's go over the endpoints regarding Niche first
+methods requiring token authentification will have this emoji beside it. :closed_lock_with_key:
+
 ### For Niche
 * `/device/register` allowed methods [POST]
     * POST 
@@ -15,27 +16,27 @@ Let's go over the endpoints regarding Niche first
 
 ### For App
 
-* `/dashboard` allowed methods [GET]    **NOT YET IMPLEMENTED**
+* `/dashboard` allowed methods [GET] :closed_lock_with_key:
     * POST
         Gets the relevant information for user's niche devices. Requires auth.
 
-* `/family/register` allowed methods [POST]
+* `/family/register` allowed methods [POST] :closed_lock_with_key:
     * POST
         Registers a family, which is the logical representation of the owner of the Niches. There can be multiple members inside a family with varying authorities. Requires auth.
 
-* `/member/register` allowed methods [POST]
+* `/member/register` allowed methods [POST] 
     * POST
-        Registers a member, which needs to be inside a family.
+        Registers a member, generating a token Requires email verification.
 
-* `/signin` allowed methods [POST]
+* `/signin` allowed methods [POST] 
     * POST
-        Signs the user in, generating a token
+        Signs the user in, generating a token.
 
-* `/checkout` allowed methods [POST]
+* `/checkout` allowed methods [POST] :closed_lock_with_key:
     * POST
         Equivalent stub for the checkout. Currently stores the items bought and alerts our delivery people by email.
 
-* `/listtocart` allowed methods [DELETE, POST, PUT]
+* `/listtocart` allowed methods [DELETE, POST, PUT] :closed_lock_with_key:
     * DELETE
         Deletes the specified list_to_cart record
     * POST
@@ -43,7 +44,7 @@ Let's go over the endpoints regarding Niche first
     * PUT 
         Updates or changes the specified list_to_cart record
 
-*  `/listtocart/list` allowed methods [GET, POST]
+*  `/listtocart/list` allowed methods [GET, POST] :closed_lock_with_key:
     * GET
         Gets all the items in the family's list
     * POST 
@@ -52,3 +53,12 @@ Let's go over the endpoints regarding Niche first
 *   `/listtocart/cart` allowed methods [GET]
     * GET
         Gets all the items in the family's shopping cart
+
+### For Twilio
+*   `/feedback` allowed methods [POST] 
+    * POST
+        Responds the call from a user
+
+*   `/feedback/save` allowed methods [POST]
+    * POST
+        Responds to Twilio's callback and saves the recording.

@@ -25,7 +25,7 @@ class FamilyController():
         try: 
             admin_invite = FamilyController.generate_invite(data['name'] + '_admin_')
             member_invite = FamilyController.generate_invite(data['name'] + '_member_')
-            new_fam = FamilyModel(data['address_line1'], data['address_line2'], data['city'], data['state'], data['zip_code'], data['name'], data['phone'], registerer.email, admin_invite, member_invite)
+            new_fam = FamilyModel(data['address_line1'], data['address_line2'], data['city'], data['state'], data['zip_code'], data['name'], registerer.phone, registerer.email, admin_invite, member_invite)
             new_fam.save_to_db()
         except:
             cls.logger.exception("Error creating a family model")
@@ -35,9 +35,11 @@ class FamilyController():
         registerer.fam_id = new_fam.id
         registerer.save_to_db()
 
-        if asyncio.get_event_loop().is_closed():
+        try:
+            loop = asyncio.get_event_loop()
+        except:
             asyncio.set_event_loop(asyncio.new_event_loop())
-
+        
         loop = asyncio.get_event_loop()
         
         # send email to who registered
@@ -70,9 +72,11 @@ class FamilyController():
             cls.logger.exception("Somehow logged in without having a family...")
             return "Ill-formed Request", 400
         
-        if asyncio.get_event_loop().is_closed():
+        try:
+            loop = asyncio.get_event_loop()
+        except:
             asyncio.set_event_loop(asyncio.new_event_loop())
-
+        
         loop = asyncio.get_event_loop()
         
         # send email to who registered
@@ -106,11 +110,13 @@ class FamilyController():
         member.fam_id = fam_id
         member.save_to_db()
 
-        if asyncio.get_event_loop().is_closed():
-                asyncio.set_event_loop(asyncio.new_event_loop())
-
-        loop = asyncio.get_event_loop()
+        try:
+            loop = asyncio.get_event_loop()
+        except:
+            asyncio.set_event_loop(asyncio.new_event_loop())
         
+        loop = asyncio.get_event_loop()
+
         # send email to who joined
         tasks = [
             asyncio.ensure_future(Emailer.join_fam(member.email, member.first_name, family.name))

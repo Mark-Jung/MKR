@@ -50,7 +50,7 @@ class FamilyView(MethodView):
             return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ['address_line1', 'address_line2', 'city', 'state', 'zip_code', 'phone', 'name']
+        req_params = ['address_line1', 'address_line2', 'city', 'state', 'zip_code', 'name']
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
