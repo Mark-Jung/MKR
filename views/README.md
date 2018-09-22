@@ -57,4 +57,8 @@ methods requiring token authentification will have this emoji beside it. :closed
 ### For Twilio
 *   `/feedback` allowed methods [POST] 
     * POST
-        Records the call from a user, alerting a few teammates. Requires auth.
+        Responds the call from a user
+
+*   `/feedback/save` allowed methods [POST]
+    * POST
+        Responds to Twilio's callback and saves the recording.

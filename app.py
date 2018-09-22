@@ -1,6 +1,4 @@
-import asyncio
 import os
-import json
 
 from db import db
 from flask import Flask, request, redirect, Response
