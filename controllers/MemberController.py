@@ -31,9 +31,11 @@ class MemberController():
                 rand_string = "test"
             else:
                 valid = True
+                alphanums = string.digits + string.ascii_lowercase
                 while valid:
-                    for i in range(4):
-                        rand_string += choice(string.digits)
+                    rand_string = ""
+                    for i in range(7):
+                        rand_string += choice(alphanums)
                     if not VerificationModel.find_by_value(rand_string):
                         valid = False
             new_member.save_to_db()
