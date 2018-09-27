@@ -12,9 +12,10 @@ from werkzeug.exceptions import HTTPException
 from views.CheckoutView import CheckoutView
 from views.DeviceDataView import DeviceDataView 
 from views.FamilyView import FamilyView
+from views.FeedbackView import FeedbackView
 from views.ListToCartView import ListToCartView
 from views.MemberView import MemberView
-from views.FeedbackView import FeedbackView
+from views.VerificationView import VerificationView
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
@@ -108,7 +109,11 @@ def signin_by_token():
 
 @app.route('/verify', methods=['POST'])
 def verify():
-    return MemberView.verify_member()
+    return VerificationView.verify_member()
+
+@app.route('/verify/re', methods=['GET'])
+def re_verify():
+    return VerificationView.resend_verification()
 
 """
 Admin View imports and definitions
