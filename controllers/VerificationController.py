@@ -61,6 +61,23 @@ class VerificationController():
         except:
             cls.logger.exception("Error while saving to db")
             return "Internal Server Error", 500
+
+        member = MemberModel.find_by_id(member_id)
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                asyncio.set_event_loop(asyncio.new_event_loop())
+        except:
+            asyncio.set_event_loop(asyncio.new_event_loop())
+        
+        loop = asyncio.get_event_loop()
+
+        # send verification code to who registered
+        tasks = [
+            asyncio.ensure_future(Emailer.send_verification(member.email, member.first_name, new_verification.value))
+        ]
+        loop.run_until_complete(asyncio.wait(tasks))
+        loop.close()
     
         return "", 201 
     
