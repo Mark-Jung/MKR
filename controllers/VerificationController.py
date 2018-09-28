@@ -39,7 +39,6 @@ class VerificationController():
     
     @classmethod
     def resend_verification(cls, member_id):
-        
         if os.environ.get("SECRET", "dev") == "dev":
             rand_string = "retest"
         else:
@@ -57,7 +56,7 @@ class VerificationController():
                 cls.logger.exception("Error while creating random string")
                 return "Internal Server Error", 500
         try:
-            new_verification = VerificationModel(rand_string, new_member.id)
+            new_verification = VerificationModel(rand_string, member_id)
             new_verification.save_to_db()
         except:
             cls.logger.exception("Error while saving to db")

@@ -52,6 +52,8 @@ class CheckoutController():
         
         try:
             loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                asyncio.set_event_loop(asyncio.new_event_loop())
         except:
             asyncio.set_event_loop(asyncio.new_event_loop())
         

@@ -127,17 +127,6 @@ class UserTests(unittest.TestCase):
             ))
         self.assertEqual(200, verify.status_code)
 
-        # verify email for member  
-        verify = self.app.post('/verify',
-            data=json.dumps({"verification_code": "test"}),
-            headers=dict(
-                Authorization="Bearer " + member_token,
-                content_type="application/json"
-            ))
-        self.assertEqual(200, verify.status_code)
-
-
-
         # join family as member
         join = self.app.post('/family/join',
             data=json.dumps({"invite_code": member_invite}),
