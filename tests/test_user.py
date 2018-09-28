@@ -110,9 +110,17 @@ class UserTests(unittest.TestCase):
         member_token = json.loads(member.data.decode())['token']
         self.assertEqual(201, member.status_code)
 
-        # verify email for member
+        # resend verification
+        resend_verify = self.app.get('/verify/re',
+            headers=dict(
+                Authorization="Bearer " + member_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(201, resend_verify.status_code)
+
+        # verify email for member - resend
         verify = self.app.post('/verify',
-            data=json.dumps({"verification_code": "test"}),
+            data=json.dumps({"verification_code": "retest"}),
             headers=dict(
                 Authorization="Bearer " + member_token,
                 content_type="application/json"

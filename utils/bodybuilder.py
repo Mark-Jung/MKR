@@ -56,6 +56,25 @@ class BodyBuilder():
             </body>
         </html>"""
         return body 
+
+    @classmethod 
+    def invite(cls, invite_code, fam_name, title):
+        body = """
+        <html>
+            <body style="text-align:center; font-size: 18px; font-family: 'Times New Roman', Times, serif;">
+                <h3>You have been invited to family {fam_name} as a {title}</h3>
+                <div style="margin-top: 3px;">invite code: {invite_code} </div>
+                <br>
+                <div>Thank you</div>
+                <br>
+                <hr style="width:50%;">
+                <br>
+                <div>Team Niche</div>
+                <br>
+            </body>
+        </html>
+        """.format(invite_code=invite_code, fam_name=fam_name, title=title)
+        return body 
     
     @classmethod
     def signup_createfam(cls, name, admin_invite, member_invite, fam_name):
