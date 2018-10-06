@@ -19,10 +19,10 @@ class MemberController():
         # check if family with the same name exist
         member_already = MemberModel.find_by_email(data['email'])
         if member_already:
-            return "Ill-formed Request", 400, None
+            return "Try a different E-mail", 400, None
         member_already = MemberModel.find_by_phone(data['phone'])
         if member_already:
-            return "Ill-formed Request", 400, None
+            return "Try a different Phone number", 400, None
 
         try: 
             new_member = MemberModel(data['first_name'], data['last_name'], data['email'], data['phone'], data['password'])
@@ -77,7 +77,7 @@ class MemberController():
             else:
                 return "Invalid combination", 403, None
         else:
-            return "Ill-formed Request", 400, None
+            return "An account doesn't exist with this email.", 400, None
 
     @classmethod
     def update_token(cls, token):

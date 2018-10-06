@@ -19,7 +19,7 @@ class FamilyController():
         # check if family with the same name exist
         fam_already = FamilyModel.find_by_name(data['name'])
         if fam_already:
-            return "Ill-formed Reqeust. Name should be unique", 400, None
+            return "Name should be unique", 400, None
         registerer = MemberModel.find_by_id(member_id)
 
         try: 
