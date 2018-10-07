@@ -10,8 +10,7 @@ from utils.email import Emailer
 from utils.logger import Logger
 
 class FamilyController():
-    promo_length = 8
-    allchar = string.ascii_letters + string.digits
+    allchar = string.digits
     logger = Logger(__name__)
 
     @classmethod
@@ -23,8 +22,8 @@ class FamilyController():
         registerer = MemberModel.find_by_id(member_id)
 
         try: 
-            admin_invite = FamilyController.generate_invite(data['name'] + '_admin_')
-            member_invite = FamilyController.generate_invite(data['name'] + '_member_')
+            admin_invite = FamilyController.generate_invite(8)
+            member_invite = FamilyController.generate_invite(8)
             new_fam = FamilyModel(data['address_line1'], data['address_line2'], data['city'], data['state'], data['zip_code'], data['name'], registerer.phone, registerer.email, admin_invite, member_invite)
             new_fam.save_to_db()
         except:
@@ -54,11 +53,11 @@ class FamilyController():
         return "", 201, {"admin": new_fam.admin_invite, "member": new_fam.member_invite}
     
     @classmethod
-    def generate_invite(cls, keyword):
+    def generate_invite(cls, promo_len):
         found = False
-        new_invite = keyword
+        new_invite = ""
         while not found:
-            for x in range(cls.promo_length):
+            for x in range(promo_len):
                 new_invite += choice(cls.allchar)
             if FamilyModel.find_by_invite_admin(new_invite) is None and FamilyModel.find_by_invite_member(new_invite) is None:
                 found = True
