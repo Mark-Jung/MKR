@@ -12,15 +12,14 @@ class DeviceDataView(MethodView):
     def claim_niche(cls):
         err, status, member_id, fam_id = Auth.whoisit(request.headers)
         if err:
-            return json.dumps({"error_message": err}), 400
-        
+            return json.dumps({"error_message": err}), status
 
         data = json.loads(request.data.decode('utf-8'))
         req_params = ['device_id', 'alert_level', 'container', 'alias', 'auto_order_store', 'product_metadata']
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = DeviceDataController.claim_niche(fam_id, data)
+        error_message, status = DeviceDataController.edit_niche(fam_id, data)
 
         if error_message:
             return json.dumps({"error_message": error_message}), status

@@ -2,36 +2,12 @@ from datetime import datetime
 
 from models.DeviceDataModel import DeviceDataModel
 from models.DeviceShadowModel import DeviceShadowModel
+from models.ListToCartModel import ListToCartModel 
 from utils.logger import Logger
 
 class DeviceDataController():
     logger = Logger(__name__)
 
-    @classmethod
-    def claim_niche(cls, fam_id, data):
-        target_device = DeviceShadowModel.find_by_device_id(data['device_id'])
-        if not target_device:
-            cls.logger.exception("Tried to add a stamp of a device that doesn't exist")
-            return "Invalid Request", 400
-        
-        if target_device.fam_id and target_device.fam_id != fam_id:
-            cls.logger.exception("Tried to claim someone else's niche device")
-            return "Invalid Request", 400
-        
-        try:
-            target_device.alert_level = data['alert_level']
-            target_device.container = data['container']
-            target_device.alias = data['alias']
-            target_device.auto_order_store = data['auto_order_store']
-            target_device.product_metadata = data['product_metadata']
-            target_device.fam_id = fam_id
-            target_device.save_to_db()
-        except:
-            cls.logger.exception("Error in editing and saving initial niche info")
-            return "Internal Server Error", 500
-
-        return "", 200
-    
     @classmethod
     def collect_data(cls, device_id, metadata):
         target_device = DeviceShadowModel.find_by_device_id(device_id)
@@ -50,8 +26,23 @@ class DeviceDataController():
                 target_device.shadow_metadata = new_stamp.device_metadata
                 target_device.date_updated = new_stamp.date_created
                 target_device.save_to_db()
+                if int(new_stamp.device_metadata['percent']) < target_device.alert_level:
+                    # move that niche thing to list
+                    # if the same name is in the listtocart, delete that item 
+                    already = ListToCartModel.get_fam_list(target_device.fam_id)
+                    for each in already:
+                        if each.alias == target_device.alias:
+                            each.delete_from_db()
+                    # new entry
+                    try:
+                        new_list_to_cart = ListToCartModel(target_device.alias, target_device.auto_order_store, target_device.fam_id, "Niche")
+                        new_list_to_cart.save_to_db()
+                    except:
+                        cls.logger.exception("Error while moving niche into listtocart")
+                        return "Internal Server Error", 500
             except:
                 cls.logger.exception("Error while saving most recent")
+                return "Internal Server Error", 500
 
         return "", 201
 
@@ -77,7 +68,9 @@ class DeviceDataController():
             cls.logger.exception("Tried to add a stamp of a device that doesn't exist")
             return "Invalid Request", 400
         
-        if target_device.fam_id != fam_id:
+        if not target_device.fam_id:
+            target_device.fam_id = fam_id
+        elif target_device.fam_id != fam_id:
             cls.logger.exception("Tried to claim someone else's niche device")
             return "Invalid Request", 400
         

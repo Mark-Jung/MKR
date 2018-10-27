@@ -9,20 +9,36 @@ from utils.auth import Auth
 class ListToCartView(MethodView):
    
     @classmethod
-    def delete_list_to_cart(cls):
+    def delete_list(cls):
         err, status, member_id, fam_id = Auth.whoisit(request.headers)
         if err:
             return json.dumps({"error_message": err}), 400
 
         data = json.loads(request.data.decode('utf-8'))
-        req_params = ["list_to_cart_id"]
+        req_params = ["victim_ids"]
         if not ReqParser.check_body(data, req_params):
             return json.dumps({"error_message": "ill-formed request"}), 400
 
-        error_message, status = ListToCartController.delete_list_to_cart(fam_id, data['list_to_cart_id'])
+        error_message, status, response = ListToCartController.delete_list(fam_id, data['victim_ids'])
         if error_message:
             return json.dumps({"error_message": error_message}), status
-        return json.dumps({"response": "Success"}), status
+        return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
+
+    @classmethod
+    def delete_cart(cls):
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), 400
+
+        data = json.loads(request.data.decode('utf-8'))
+        req_params = ["victim_ids"]
+        if not ReqParser.check_body(data, req_params):
+            return json.dumps({"error_message": "ill-formed request"}), 400
+
+        error_message, status, response = ListToCartController.delete_cart(fam_id, data['victim_ids'])
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": list(map(lambda x : x.json() if x else None, response))}), status
 
     @classmethod
     def edit_list_to_cart(cls):

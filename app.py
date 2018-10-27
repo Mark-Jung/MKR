@@ -2,7 +2,7 @@ import os
 
 from db import db
 from flask import Flask, request, redirect, Response
-from flask_cors import cross_origin
+from flask_cors import cross_origin, CORS
 from flask_migrate import Migrate, MigrateCommand
 from flask_admin import Admin
 from flask_admin.contrib import sqla
@@ -20,14 +20,24 @@ from views.VerificationView import VerificationView
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///localdata.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+"""
+need to make these get from env
+"""
 app.config['BASIC_AUTH_USERNAME'] = 'niche'
 app.config['BASIC_AUTH_PASSWORD'] = 'selmanisgod'
+app.secret_key = 'super secret key'
+"""
+till here
+"""
+app.config['SESSION_TYPE'] = 'filesystem'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
 admin = Admin(app, name="niche", template_mode='bootstrap3')
 
+if __name__ == '__main__':
+    CORS(app)
+
 @app.route('/')
-@cross_origin()
 def hello_world():
     return "running!"
 
@@ -67,25 +77,27 @@ def save_feedback():
 def invite():
     return FamilyView.invite_by_email()
 
-@app.route('/listtocart', methods=['DELETE', 'POST', 'PUT'])
+@app.route('/listtocart', methods=['POST', 'PUT'])
 def list_to_cart():
-    if request.method == 'DELETE':
-        return ListToCartView.delete_list_to_cart()
-    elif request.method == 'POST':
+    if request.method == 'POST':
         return ListToCartView.switch_list_to_cart()
     elif request.method == 'PUT':
         return ListToCartView.edit_list_to_cart()
 
-@app.route('/listtocart/list', methods=['GET', 'POST'])
+@app.route('/listtocart/list', methods=['DELETE', 'GET', 'POST'])
 def list_to_cart_list():
-    if request.method == 'GET':
+    if request.method == 'DELETE':
+        return ListToCartView.delete_list()
+    elif request.method == 'GET':
         return ListToCartView.get_list()
     elif request.method == 'POST':
         return ListToCartView.register_list_to_cart()
 
-@app.route('/listtocart/cart', methods=['GET'])
+@app.route('/listtocart/cart', methods=['DELETE', 'GET'])
 def list_to_cart_cart():
-    if request.method == 'GET':
+    if request.method == 'DELETE':
+        return ListToCartView.delete_cart()
+    elif request.method == 'GET':
         return ListToCartView.get_cart()
 
 @app.route('/member/register', methods=['POST'])
@@ -152,9 +164,9 @@ class DeviceDataAdminView(ModelView):
     column_default_sort = ('date_created', True)
 
 class DeviceShadowAdminView(ModelView):
-    column_list = ['fam_id', 'device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias', 'shadow_metadata', 'product_metadata']
+    column_list = ['fam_id', 'device_id', 'auto_order_store','date_created', 'date_updated', 'alert_level', 'container', 'alias', 'shadow_metadata', 'product_metadata']
     column_searchable_list = ['device_id', 'alert_level']
-    column_filters = ['fam_id', 'device_id', 'date_created', 'date_updated', 'alert_level', 'container', 'alias']
+    column_filters = ['fam_id', 'device_id', 'auto_order_store', 'date_created', 'date_updated', 'alert_level', 'container', 'alias']
     column_default_sort = ('fam_id', True)
 
 class CheckoutAdminView(ModelView):

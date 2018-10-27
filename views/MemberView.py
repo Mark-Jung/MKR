@@ -37,12 +37,13 @@ class MemberView(MethodView):
     @classmethod
     def signin_by_token(cls):
         err, status, member_id, fam_id = Auth.whoisit(request.headers)
-        if err and member_id == 0:
-            return json.dumps({"error_message": err}), status
-        else:
-            return json.dumps({"response": err}), 200
+        if err:
+            if member_id == 0:
+                return json.dumps({"error_message": err}), status
+            else:
+                return json.dumps({"response": err}), 200
         
-        auth_header = headers.get('Authorization')
+        auth_header = request.headers.get('Authorization')
 
         error_message, status, token = MemberController.update_token(auth_header.split(" ")[1])
 
