@@ -45,7 +45,7 @@ class ListToCartModel(db.Model, BaseModel):
             "adder": self.adder,
             "item_name": self.item_name,
             "item_image": self.item_image,
-            "item_price": self.item_price,
+            "item_price": self.item_price / 100,
             "item_rating": self.item_rating,
             "item_quantity": self.item_quantity,
             "fam_id": self.fam_id,

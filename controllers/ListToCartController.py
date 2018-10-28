@@ -87,12 +87,11 @@ class ListToCartController():
             return "Ill-formed Request", 400
         try:
             target.in_cart = not target.in_cart
-            target.alias = ""
             target.in_store = ""
             target.item_image = ""
             target.item_name = ""
             target.item_price = 0
-            target.item_quantity = "" 
+            target.item_quantity = 0
             target.save_to_db()
         except:
             cls.logger.exception("Error toggling and saving list_to_cart")
