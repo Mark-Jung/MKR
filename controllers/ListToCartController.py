@@ -124,7 +124,7 @@ class ListToCartController():
         already = ListToCartModel.get_fam_list(fam_id)
         for each in already:
             if each.alias == alias:
-                return "Ill-Formed Request", 400
+                return "Duplicate item in list", 400
         try:
             new_list_to_cart = ListToCartModel(alias, in_store, fam_id, member.first_name + " " + member.last_name)
             new_list_to_cart.save_to_db()

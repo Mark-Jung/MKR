@@ -26,20 +26,27 @@ class DeviceDataController():
                 target_device.shadow_metadata = new_stamp.device_metadata
                 target_device.date_updated = new_stamp.date_created
                 target_device.save_to_db()
-                if int(new_stamp.device_metadata['percent']) < target_device.alert_level:
+                if float(new_stamp.device_metadata['percent']) < target_device.alert_level:
                     # move that niche thing to list
                     # if the same name is in the listtocart, delete that item 
+                    make = True
                     already = ListToCartModel.get_fam_list(target_device.fam_id)
                     for each in already:
                         if each.alias == target_device.alias:
-                            each.delete_from_db()
-                    # new entry
-                    try:
-                        new_list_to_cart = ListToCartModel(target_device.alias, target_device.auto_order_store, target_device.fam_id, "Niche")
-                        new_list_to_cart.save_to_db()
-                    except:
-                        cls.logger.exception("Error while moving niche into listtocart")
-                        return "Internal Server Error", 500
+                            each.from_niche = True
+                            each.in_store = target_device.auto_order_store
+                            each.save_to_db()
+                            make = False
+                            
+                    if make:
+                        try:
+                            new_list_to_cart = ListToCartModel(target_device.alias, target_device.auto_order_store, target_device.fam_id, "Niche")
+                            new_list_to_cart.from_niche = True
+                            new_list_to_cart.save_to_db()
+                        except:
+                            cls.logger.exception("Error while moving niche into listtocart")
+                            return "Internal Server Error", 500
+                    
             except:
                 cls.logger.exception("Error while saving most recent")
                 return "Internal Server Error", 500
@@ -73,6 +80,12 @@ class DeviceDataController():
         elif target_device.fam_id != fam_id:
             cls.logger.exception("Tried to claim someone else's niche device")
             return "Invalid Request", 400
+
+        fam_devices = DeviceShadowModel.filter_by_fam_id(fam_id)
+        for each in fam_devices:
+            if each.alias == data['alias'] and each.device_id != target_device.device_id :
+                cls.logger.exception("Tried to make niches with duplicate names")
+                return "Use different names for your niches", 400
         
         try:
             target_device.alert_level = data['alert_level']

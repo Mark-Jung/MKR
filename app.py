@@ -185,7 +185,7 @@ class FeedbackAdminView(ModelView):
     column_default_sort = ('id', True) 
 
 class ListToCartAdminView(ModelView):
-    column_list = ['id', 'date_created', 'alias', 'in_cart', 'in_store', 'adder', 'item_name', 'item_image', 'item_price', 'item_rating', 'item_quantity', 'fam_id']
+    column_list = ['id', 'date_created', 'alias', 'in_cart', 'in_store', 'bought', 'from_niche', 'adder', 'item_name', 'item_image', 'item_price', 'item_rating', 'item_quantity', 'fam_id']
     column_filters = ['id', 'adder', 'alias', 'item_name', 'item_image', 'item_price', 'item_quantity', 'fam_id']
     column_default_sort = ('id', True)
 

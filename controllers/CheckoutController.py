@@ -32,6 +32,8 @@ class CheckoutController():
             if target:
                 if target.in_cart and target.item_name and target.item_image and target.item_price and target.item_quantity:
                     item_data.append(target.json())
+                    target.bought = True
+                    target.save_to_db()
                 else:
                     cls.logger.exception("Requested a list_to_cart that doens't have sufficient info for checkout")
                     return "Ill-formed Request", 400

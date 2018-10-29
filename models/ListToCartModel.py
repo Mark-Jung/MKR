@@ -20,6 +20,9 @@ class ListToCartModel(db.Model, BaseModel):
     item_rating = db.Column(db.String(255))
     item_quantity = db.Column(db.Integer)
 
+    from_niche = db.Column(db.Boolean)
+    bought = db.Column(db.Boolean)
+
     fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
 
     def __init__(self, alias, in_store, fam_id, adder_name):
@@ -34,6 +37,9 @@ class ListToCartModel(db.Model, BaseModel):
         self.item_rating = ""
         self.item_quantity = 0
 
+        self.from_niche = False
+        self.bought = False
+
         self.fam_id = fam_id
     
     def json(self):
@@ -42,6 +48,8 @@ class ListToCartModel(db.Model, BaseModel):
             "alias": self.alias,
             "in_cart": self.in_cart,
             "in_store": self.in_store,
+            "from_niche": self.from_niche,
+            "bought": self.bought,
             "adder": self.adder,
             "item_name": self.item_name,
             "item_image": self.item_image,
@@ -61,4 +69,4 @@ class ListToCartModel(db.Model, BaseModel):
 
     @classmethod
     def get_fam_cart(cls, fam_id):
-        return cls.query.filter(cls.fam_id==fam_id, cls.in_cart==True).all()
+        return cls.query.filter(cls.fam_id==fam_id, cls.in_cart==True, cls.bought==False).all()
