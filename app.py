@@ -33,6 +33,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 migrate = Migrate(app, db)
 basic_auth = BasicAuth(app)
 admin = Admin(app, name="niche", template_mode='bootstrap3')
+CORS(app)
 
 if __name__ == '__main__':
     CORS(app)

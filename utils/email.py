@@ -44,7 +44,7 @@ class Emailer():
         cls.send_email("GO FULFILL THE NICHE ORDER!!!!!!!", HTML_BODY, recipients)
         
     @classmethod 
-    async def create_fam(cls, email, name, fam_name, admin_invite, member_invite):
+    async def create_fam(cls, email, name, admin_invite, member_invite, fam_name):
         body = BodyBuilder.signup_createfam(name, admin_invite, member_invite, fam_name)
         HTML_BODY = MIMEText(body, 'html')
 

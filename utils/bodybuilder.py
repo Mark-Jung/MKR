@@ -88,7 +88,7 @@ class BodyBuilder():
                 <div style="margin-top: 3px;">{fam_name} </div>
                 <div style="margin-top: 3px;">Below are the invite codes for the family</div>
                 <div style="margin-top: 3px;">Admin Invite Code: {admin_invite}</div>
-                <div style="margin-top: 3px;">Member Invite Code: {member_invite} USD</div>
+                <div style="margin-top: 3px;">Member Invite Code: {member_invite}</div>
                 <div>Thank you</div>
                 <br>
                 <hr style="width:50%;">
