@@ -52,6 +52,10 @@ class MemberModel(db.Model, BaseModel):
     @classmethod
     def find_by_family(cls, fam_id):
         return cls.query.filter_by(fam_id=fam_id).all()
+    
+    @classmethod
+    def find_fam_with_auth(cls, fam_id, authority):
+        return cls.query.filter(cls.fam_id==fam_id, cls.authority==authority).all()
 
     def validate_password(self, password):
         """

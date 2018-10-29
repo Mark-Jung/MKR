@@ -7,6 +7,18 @@ from utils.auth import Auth
 import json
 
 class MemberView(MethodView):
+
+    @classmethod
+    def get_profile(cls):
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), status
+
+        error_message, status, response = MemberController.get_profile(fam_id, member_id)
+    
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": response}), status
     
     @classmethod
     def register_member(cls):

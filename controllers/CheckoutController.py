@@ -20,7 +20,7 @@ class CheckoutController():
             return "Unauthorized Request", 403
             
         try:
-            new_checkout = CheckoutModel(total, member_id)
+            new_checkout = CheckoutModel(total, fam_id, member_id)
             new_checkout.save_to_db()
         except:
             cls.logger.exception("Error creating new Checkout object")
@@ -30,7 +30,7 @@ class CheckoutController():
         for list_to_cart_id in items:
             target = ListToCartModel.find_by_id(list_to_cart_id)
             if target:
-                if target.in_cart and target.item_name and target.item_image and target.item_price and target.item_quantity:
+                if target.in_cart and target.item_name and target.item_image and target.item_price and target.item_quantity and not target.bought:
                     item_data.append(target.json())
                     target.bought = True
                     target.save_to_db()

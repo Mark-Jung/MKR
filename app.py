@@ -112,6 +112,11 @@ def user_niche_actions():
     elif request.method == 'PUT':
         return DeviceDataView.edit_niche()
 
+@app.route('/profile', methods=['GET'])
+def profile():
+    if request.method == 'GET':
+        return MemberView.get_profile()
+
 @app.route('/signin', methods=['POST'])
 def signin():
     return MemberView.signin()
@@ -171,8 +176,8 @@ class DeviceShadowAdminView(ModelView):
     column_default_sort = ('fam_id', True)
 
 class CheckoutAdminView(ModelView):
-    column_list = ['id', 'date_created', 'total', 'member_id']
-    column_filters = ['id', 'date_created', 'total', 'member_id']
+    column_list = ['id', 'date_created', 'total', 'fam_id', 'member_id']
+    column_filters = ['id', 'date_created', 'total', 'fam_id', 'member_id']
     column_default_sort = ('id', True)
 
 class FamilyAdminView(ModelView):

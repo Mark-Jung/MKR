@@ -4,6 +4,7 @@ import os
 from random import *
 import string
 
+from models.CheckoutModel import CheckoutModel
 from models.FamilyModel import FamilyModel
 from models.MemberModel import MemberModel
 from models.VerificationModel import VerificationModel
@@ -13,6 +14,38 @@ from utils.email import Emailer
 
 class MemberController():
     logger = Logger(__name__)
+
+    @classmethod 
+    def get_profile(cls, fam_id, member_id):
+        member = MemberModel.find_by_id(member_id)
+        family = FamilyModel.find_by_id(fam_id)
+        # get first, last name from member
+        first_name = member.first_name
+        last_name = member.last_name
+        # get admin_invite and member invite from family
+        admin_invite = family.admin_invite
+        member_invite = family.member_invite
+
+        total = 0
+        all_checkout = []
+        # get family total(run through checkout)
+        try:
+            fam_checkout = CheckoutModel.filter_by_fam_id(fam_id)
+            for each in fam_checkout:
+                all_checkout.append(each.json())
+                total += each.total
+        except:
+            cls.logger.exception("Error in getting all checkouts by family")
+            return "Internal Server Error", 500, None
+        result = {
+            "first_name": first_name,
+            "last_name": last_name,
+            "total": total,
+            "admin_invite": admin_invite,
+            "member_invte": member_invite,
+            "order_history": all_checkout,
+        }
+        return "", 200, result
 
     @classmethod
     def register_member(cls, data):

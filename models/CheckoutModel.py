@@ -10,17 +10,24 @@ class CheckoutModel(db.Model, BaseModel):
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
 
     total = db.Column(db.Integer)
-    member_id = db.Column(db.Integer, db.ForeignKey('member.id'))
+    fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
+    member_id = db.Column(db.Integer)
 
-    def __init__(self, total, member_id):
+    def __init__(self, total, fam_id, member_id):
         self.total = total
+        self.fam_id = fam_id
         self.member_id = member_id
 
     def json(self):
         return {
             "total": self.total,
-            "member_id": self.member_id
+            "fam_id": self.fam_id,
+            "member_id": self.member_id,
+            "date_created": self.date_created.strftime("%Y-%m-%d %H:%M:%S"),
         }
+    @classmethod
+    def filter_by_fam_id(cls, fam_id):
+        return cls.query.filter_by(fam_id=fam_id).all()
 
     @classmethod
     def filter_by_member_id(cls, member_id):
