@@ -40,7 +40,7 @@ class BodyBuilder():
                 <br>
                 <div>items list:</div>
                 <br>
-        """.format(total=float(total/100), member_name=member_name, family_name=family_name, checkout_id=checkout_id)
+        """.format(total=float(total)/100, member_name=member_name, family_name=family_name, checkout_id=checkout_id)
         for product in items:
             body += """
                 <br>
@@ -51,7 +51,7 @@ class BodyBuilder():
                 <div style="margin-top: 3px;">Item Image below </div>
                 <img style="width: 200px; height: 110px;" src="{url}" alt="item picture" title="picture"/>
                 <br>
-            """.format(id=product['id'], store=product['in_store'], price='%.2f' % float(product['item_price']/100), url=product['item_image'], name=product['item_name'])
+            """.format(id=product['id'], store=product['in_store'], price=product['item_price'], url=product['item_image'], name=product['item_name'])
         body += """
             </body>
         </html>"""
