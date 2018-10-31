@@ -42,7 +42,7 @@ class MemberController():
             "last_name": last_name,
             "total": total,
             "admin_invite": admin_invite,
-            "member_invte": member_invite,
+            "member_invite": member_invite,
             "order_history": all_checkout,
         }
         return "", 200, result
