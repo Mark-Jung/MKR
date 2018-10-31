@@ -43,7 +43,7 @@ class MemberController():
             "total": total,
             "admin_invite": admin_invite,
             "member_invite": member_invite,
-            "order_history": all_checkout,
+            "order_history": sorted(all_checkout, key=lambda x: x['id'], reverse=True),
         }
         return "", 200, result
 

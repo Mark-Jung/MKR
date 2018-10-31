@@ -20,6 +20,7 @@ class CheckoutModel(db.Model, BaseModel):
 
     def json(self):
         return {
+            "id": self.id,
             "total": self.total,
             "fam_id": self.fam_id,
             "member_id": self.member_id,
