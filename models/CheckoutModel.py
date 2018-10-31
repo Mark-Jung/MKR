@@ -2,12 +2,13 @@ from db import db
 
 from models.basemodel import BaseModel
 from utils.jsonable import JsonEncodedDict
+import datetime
 
 class CheckoutModel(db.Model, BaseModel):
     __tablename__ = "checkout"
 
     id = db.Column(db.Integer, primary_key=True)
-    date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
+    date_created = db.Column(db.DateTime)
 
     total = db.Column(db.Integer)
     fam_id = db.Column(db.Integer, db.ForeignKey('family.id'))
@@ -17,6 +18,7 @@ class CheckoutModel(db.Model, BaseModel):
         self.total = total
         self.fam_id = fam_id
         self.member_id = member_id
+        self.date_created = datetime.datetime.now()
 
     def json(self):
         return {
