@@ -30,7 +30,7 @@ class FeedbackController():
     @classmethod
     def save_feedback(cls, caller, record_url, record_duration):
         # make feedback model
-        member = MemberModel.find_by_phone(caller)
+        member = MemberModel.find_by_phone(caller[2:])
         if not member:
             cls.logger.exception("Called from a non-member.")
             return "Ill-formed Request", 400, None
