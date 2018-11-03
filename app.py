@@ -196,8 +196,8 @@ class ListToCartAdminView(ModelView):
     column_default_sort = ('id', True)
 
 class MemberAdminView(ModelView):
-    column_list = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id', ]
-    column_filters = ['id', 'date_created', 'email', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
+    column_list = ['id', 'date_created', 'email', 'phone', 'first_name', 'last_name', 'authority', 'verified', 'fam_id', ]
+    column_filters = ['id', 'date_created', 'email', 'phone', 'first_name', 'last_name', 'authority', 'verified', 'fam_id']
     column_default_sort = ('id', True)
 
 class ProductAdminView(ModelView):
