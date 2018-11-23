@@ -165,7 +165,7 @@ class CheckoutTests(unittest.TestCase):
         self.assertEqual(201, admin_add_to_list.status_code)
 
         member_add_to_list = self.app.post('/listtocart/list', 
-        data=json.dumps(self.list_info), 
+        data=json.dumps(self.list_info_1), 
         headers=dict(
                 Authorization="Bearer " + member_token,
                 content_type= "application/json"

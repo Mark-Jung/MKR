@@ -8,6 +8,27 @@ from utils.auth import Auth
 
 
 class DeviceDataView(MethodView):
+
+    @classmethod
+    def change_shadow_fam(cls):
+        """
+        allow other users to change when this scenario becomes common
+        """
+        err, status, member_id, fam_id = Auth.whoisit(request.headers)
+        if err:
+            return json.dumps({"error_message": err}), status
+
+        data = json.loads(request.data.decode('utf-8'))
+        req_params = ['secret', 'device_id']
+        if not ReqParser.check_body(data, req_params):
+            return json.dumps({"error_message": "ill-formed request"}), 400
+
+        error_message, status = DeviceDataController.change_shadow_fam(fam_id, data)
+
+        if error_message:
+            return json.dumps({"error_message": error_message}), status
+        return json.dumps({"response": "Success"}), status
+
     @classmethod
     def claim_niche(cls):
         err, status, member_id, fam_id = Auth.whoisit(request.headers)

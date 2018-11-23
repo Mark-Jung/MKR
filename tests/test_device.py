@@ -96,6 +96,15 @@ class DeviceTests(unittest.TestCase):
         "name": "niche",
     }
 
+    family_info_1 = {
+        "address_line1": "healthy",
+        "address_line2": "ll",
+        "city": "evanston",
+        "state": "il",
+        "zip_code": 63127,
+        "name": "niche1",
+    }
+
     member_info = {
         "email": "member@niche.io",
         "phone": "+17365331364",
@@ -104,6 +113,18 @@ class DeviceTests(unittest.TestCase):
         "password": "nicho"
     }
 
+    member_info_1 = {
+        "email": "test@test",
+        "phone": "+11234567890",
+        "first_name": "membero",
+        "last_name": "membero",
+        "password": "nichoo"
+    }
+
+    shadow_changefam = {
+        "secret": "wow",
+        "device_id": "trial1",
+    }
 
     ############################
     #### setup and teardown ####
@@ -169,7 +190,8 @@ class DeviceTests(unittest.TestCase):
             ))
         self.assertEqual(200, claimed_niche.status_code)
 
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percentage": 12 }}))
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percent": 12 }}))
+        Helper.print_error(sample_stamp, 201)
         self.assertEqual(201, sample_stamp.status_code)
 
         # stamp initially -- case n
@@ -180,11 +202,11 @@ class DeviceTests(unittest.TestCase):
         dashboard_data = json.loads(dashboard.data.decode())
         self.assertEqual(200, dashboard.status_code)
         self.assertEqual(1, len(dashboard_data['response']))
-        self.assertEqual(12, dashboard_data['response'][0]['shadow_metadata']['percentage'])
+        self.assertEqual(12, dashboard_data['response'][0]['shadow_metadata']['percent'])
 
 
         # stamp -- case n + 1
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percentage": 23 }}))
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "trial1", "metadata":{"battery": 23, "percent": 23 }}))
         self.assertEqual(201, sample_stamp.status_code)
         dashboard = self.app.get('/dashboard', headers=dict(
                 Authorization="Bearer " + admin_token,
@@ -193,9 +215,9 @@ class DeviceTests(unittest.TestCase):
         dashboard_data = json.loads(dashboard.data.decode())
         self.assertEqual(200, dashboard.status_code)
         self.assertEqual(1, len(dashboard_data['response']))
-        self.assertEqual(23, dashboard_data['response'][0]['shadow_metadata']['percentage'])
+        self.assertEqual(23, dashboard_data['response'][0]['shadow_metadata']['percent'])
 
-        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "23121", "metadata":{"battery": 23, "percentage": 12 }}))
+        sample_stamp = self.app.post('/device', data=json.dumps({"device_id": "23121", "metadata":{"battery": 23, "percent": 12 }}))
         self.assertEqual(201, sample_stamp.status_code)
 
         # edit niche_info
@@ -207,7 +229,6 @@ class DeviceTests(unittest.TestCase):
             ))
         self.assertEqual(200, claimed_niche.status_code)
 
-        get_trial1 = self.app.post('/dashboard', data=json.dumps({"niche_ids":['trial1']}))
         dashboard = self.app.get('/dashboard', headers=dict(
                 Authorization="Bearer " + admin_token,
                 content_type= "application/json"
@@ -216,3 +237,55 @@ class DeviceTests(unittest.TestCase):
         self.assertEqual(200, dashboard.status_code)
         self.assertEqual(1, len(dashboard_data['response']))
         self.assertEqual("edited shadow", dashboard_data['response'][0]['alias'])
+
+        # create member
+        member = self.app.post('/member/register', data=json.dumps(self.member_info_1))
+        fam2_token = json.loads(member.data.decode())['token']
+        self.assertEqual(201, member.status_code)
+
+        # verify email for member
+        verify = self.app.post('/verify',
+            data=json.dumps({"verification_code": "test"}),
+            headers=dict(
+                Authorization="Bearer " + fam2_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(200, verify.status_code)
+        # create family
+        family = self.app.post('/family/register',
+            data=json.dumps(self.family_info_1),
+            headers=dict(
+                Authorization="Bearer " + fam2_token,
+                content_type="application/json"
+            ))
+        self.assertEqual(201, family.status_code)
+        family_invite = json.loads(family.data.decode())['response']
+        admin_invite = family_invite['admin']
+        member_invite = family_invite['member']
+
+        # change niche_fam
+        change_fam = self.app.post('/device/change',
+            data=json.dumps(self.shadow_changefam),
+            headers=dict(
+                Authorization="Bearer " + fam2_token,
+                content_type="application/json",
+            ))
+        self.assertEqual(200, change_fam.status_code)
+
+        dashboard = self.app.get('/dashboard', headers=dict(
+                Authorization="Bearer " + fam2_token,
+                content_type= "application/json"
+            )) 
+        dashboard_data = json.loads(dashboard.data.decode())
+        self.assertEqual(200, dashboard.status_code)
+        self.assertEqual(1, len(dashboard_data['response']))
+        self.assertEqual("edited shadow", dashboard_data['response'][0]['alias'])
+
+        dashboard = self.app.get('/dashboard', headers=dict(
+                Authorization="Bearer " + admin_token,
+                content_type= "application/json"
+            )) 
+        dashboard_data = json.loads(dashboard.data.decode())
+        self.assertEqual(200, dashboard.status_code)
+        self.assertEqual(0, len(dashboard_data['response']))
+

@@ -54,6 +54,10 @@ def create_niche():
 def collect_data():
     return DeviceDataView.collect_data()
 
+@app.route('/device/change', methods=['POST'])
+def change_shadow():
+    return DeviceDataView.change_shadow_fam()
+
 @app.route('/dashboard', methods=['GET'])
 def load_dashboard():
     return DeviceDataView.get_niches()
