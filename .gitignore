@@ -6,3 +6,5 @@ deploy*
 migrations/
 ./tests/*.db
 setup.sh
+tests/test.db
+

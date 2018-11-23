@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from models.DeviceDataModel import DeviceDataModel
@@ -7,6 +8,24 @@ from utils.logger import Logger
 
 class DeviceDataController():
     logger = Logger(__name__)
+
+    @classmethod
+    def change_shadow_fam(cls, fam_id, data):
+        target_shadow = DeviceShadowModel.find_by_device_id(data['device_id'])
+        if not target_shadow:
+            cls.logger.exception("Tried to change family of a shadow that doesn't exit.")
+            return "Invalid niche id", 400
+        if os.environ.get("SECRET", "wow") != data['secret']:
+            return "Invalid Request", 400
+        try:
+            target_shadow.fam_id = fam_id
+            target_shadow.save_to_db()
+        except:
+            cls.logger.exception("Error while changing family id of a shadow")
+            return "Internal Server Error", 500
+        
+        return "", 200
+
 
     @classmethod
     def collect_data(cls, device_id, metadata):

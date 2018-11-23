@@ -201,7 +201,7 @@ class ListToCartTests(unittest.TestCase):
             ))
         self.assertEqual(201, admin_add_to_list.status_code)
         member_add_to_list = self.app.post('/listtocart/list', 
-        data=json.dumps(self.list_info), 
+        data=json.dumps(self.list_info_1), 
         headers=dict(
                 Authorization="Bearer " + member_token,
                 content_type= "application/json"
@@ -229,8 +229,8 @@ class ListToCartTests(unittest.TestCase):
 
         # delete an item from list 
         # delete invalid list to cart obj
-        delete_from_list = self.app.delete('/listtocart', 
-        data=json.dumps({"list_to_cart_id": 3}), 
+        delete_from_list = self.app.delete('/listtocart/list', 
+        data=json.dumps({"victim_ids": [3]}), 
         headers=dict(
                 Authorization="Bearer " + member_token,
                 content_type= "application/json"
@@ -245,8 +245,8 @@ class ListToCartTests(unittest.TestCase):
         list_get_data_admin = json.loads(list_by_admin.data.decode())
         self.assertEqual(2, len(list_get_data_admin['response']))
         # valid delete
-        delete_from_list = self.app.delete('/listtocart', 
-        data=json.dumps({"list_to_cart_id": 1}), 
+        delete_from_list = self.app.delete('/listtocart/list', 
+        data=json.dumps({"victim_ids": [1]}), 
         headers=dict(
                 Authorization="Bearer " + member_token,
                 content_type= "application/json"
@@ -371,7 +371,7 @@ class ListToCartTests(unittest.TestCase):
         self.assertEqual(201, admin_add_to_list.status_code)
 
         member_add_to_list = self.app.post('/listtocart/list', 
-        data=json.dumps(self.list_info), 
+        data=json.dumps(self.list_info_1), 
         headers=dict(
                 Authorization="Bearer " + member_token,
                 content_type= "application/json"
