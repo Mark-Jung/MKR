@@ -61,4 +61,4 @@ class MemberView(MethodView):
 
         if error_message:
             return json.dumps({"error_message": error_message}), status
-        return json.dumps({"response": token}), status 
+        return json.dumps({"response": token, "uid": member_id}), status 
